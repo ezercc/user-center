@@ -23,6 +23,9 @@ publishDir            = "public"
 [outputs]
 home = ["HTML", "JSON"]
 
+[minify]
+  disableXML = true
+
 [sitemap]
   changefreq = "weekly"
   priority = 0.5
