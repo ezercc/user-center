@@ -18,13 +18,13 @@
       {{ range .Translations }}
     <xhtml:link
       rel="alternate"
-      hreflang="{{ .Language.LanguageCode | default .Language.Lang }}"
+      hreflang="{{ .Lang }}"
       href="{{ .Permalink }}"
     />
       {{ end }}
     <xhtml:link
       rel="alternate"
-      hreflang="{{ .Language.LanguageCode | default .Language.Lang }}"
+      hreflang="{{ .Lang }}"
       href="{{ .Permalink }}"
     />
     {{ end }}
