@@ -21,7 +21,7 @@ publishDir            = "public"
     title = "Ezer Account"
 
 [outputs]
-home = ["HTML", "JSON", "Sitemap"]
+home = ["HTML", "JSON"]
 
 [sitemap]
   changefreq = "weekly"
