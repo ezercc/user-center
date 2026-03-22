@@ -256,3 +256,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 将 UnreadBadge 暴露给全局，以便 message.js 在阅读后手动调用刷新
 window.UnreadBadge = UnreadBadge;
+
+// ----------------------------------------------------------------
+// 人机验证 (hCaptcha)
+// ----------------------------------------------------------------
+const SITE_KEY = 'ea4ad0ce-1bf0-4b58-be28-3730062ac914';
+
+function executeCaptcha() {
+    return new Promise((resolve, reject) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'captcha-overlay';
+        const box = document.createElement('div');
+        box.className = 'captcha-box';
+        const captchaDiv = document.createElement('div');
+        const uniqueId = 'h-captcha-' + Date.now();
+        captchaDiv.id = uniqueId;
+        box.appendChild(captchaDiv);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('active'));
+
+        if (!window.hcaptcha) {
+            const msg = (window.i18n && window.i18n.captcha_load_failed) || 
+                        (window.userI18n && window.userI18n.captcha_load_failed) || 
+                        '验证组件加载失败';
+            Notifications.show(msg, 'error');
+            overlay.remove(); reject('Captcha fail'); return;
+        }
+
+        try {
+            window.hcaptcha.render(uniqueId, {
+                sitekey: SITE_KEY,
+                callback: (token) => {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 300);
+                    resolve(token);
+                },
+                'error-callback': () => {
+                    const msg = (window.i18n && window.i18n.captcha_failed) || 
+                                (window.userI18n && window.userI18n.captcha_failed) || 
+                                '验证失败';
+                    Notifications.show(msg, 'error');
+                    overlay.remove(); reject('Captcha error');
+                },
+                'close-callback': () => {
+                    overlay.remove(); reject('Captcha closed');
+                }
+            });
+        } catch (e) {
+            overlay.remove(); reject(e);
+        }
+    });
+}
+
+window.executeCaptcha = executeCaptcha;

@@ -88,23 +88,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 我们通过尝试用旧密码 SignIn 来模拟验证。
         Notifications.show(window.userI18n ? window.userI18n.verifying_password : '正在验证原密码...', 'info');
 
-        const { error: verifyError } = await client.auth.signInWithPassword({
-            email: user.email,
-            password: oldPwd
-        });
+        try {
+            const token = await executeCaptcha();
+            const { error: verifyError } = await client.auth.signInWithPassword({
+                email: user.email,
+                password: oldPwd,
+                options: { captchaToken: token }
+            });
 
-        if (verifyError) {
-            console.error('Password verification failed:', verifyError);
-            let errMsg = window.userI18n ? window.userI18n.password_error : '原密码错误，请重试';
-            
-            // 如果是频率限制或其他明确错误，显示具体信息
-            if (verifyError.status === 429) {
-                errMsg = '请求过于频繁，请稍后再试';
-            } else if (verifyError.message && verifyError.message !== 'Invalid login credentials') {
-                errMsg = verifyError.message;
+            if (verifyError) {
+                console.error('Password verification failed:', verifyError);
+                let errMsg = window.userI18n ? window.userI18n.password_error : '原密码错误，请重试';
+
+                // 如果是频率限制或其他明确错误，显示具体信息
+                if (verifyError.status === 429) {
+                    errMsg = '请求过于频繁，请稍后再试';
+                } else if (verifyError.message && verifyError.message !== 'Invalid login credentials') {
+                    errMsg = verifyError.message;
+                }
+
+                return Notifications.show(errMsg, 'error');
             }
-
-            return Notifications.show(errMsg, 'error');
+        } catch (captchaErr) {
+            if (captchaErr === 'Captcha closed') return;
+            return Notifications.show('验证码校验失败', 'error');
         }
 
         // 验证通过，更新密码
