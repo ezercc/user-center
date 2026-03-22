@@ -94,7 +94,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (verifyError) {
-            return Notifications.show(window.userI18n ? window.userI18n.password_error : '原密码错误，请重试', 'error');
+            console.error('Password verification failed:', verifyError);
+            let errMsg = window.userI18n ? window.userI18n.password_error : '原密码错误，请重试';
+            
+            // 如果是频率限制或其他明确错误，显示具体信息
+            if (verifyError.status === 429) {
+                errMsg = '请求过于频繁，请稍后再试';
+            } else if (verifyError.message && verifyError.message !== 'Invalid login credentials') {
+                errMsg = verifyError.message;
+            }
+
+            return Notifications.show(errMsg, 'error');
         }
 
         // 验证通过，更新密码
