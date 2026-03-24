@@ -258,6 +258,18 @@ document.addEventListener('DOMContentLoaded', () => {
 window.UnreadBadge = UnreadBadge;
 
 // ----------------------------------------------------------------
+// 路由与重定向辅助 (i18n 兼容)
+// ----------------------------------------------------------------
+function getLoginUrl(redirectPath = '/') {
+    const isEn = window.location.pathname.startsWith('/en/');
+    const base = isEn ? '/en/login/' : '/login/';
+    const redirect = isEn ? (redirectPath.startsWith('/en/') ? redirectPath : '/en' + redirectPath) : redirectPath;
+    return `${base}?redirect=${encodeURIComponent(redirect)}`;
+}
+
+window.getLoginUrl = getLoginUrl;
+
+// ----------------------------------------------------------------
 // 人机验证 (hCaptcha)
 // ----------------------------------------------------------------
 const SITE_KEY = 'ea4ad0ce-1bf0-4b58-be28-3730062ac914';
