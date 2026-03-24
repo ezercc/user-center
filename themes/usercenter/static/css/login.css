@@ -6,7 +6,7 @@
     right: -20px;
     bottom: -20px;
     background: url('/background.jpg') center/cover no-repeat;
-    filter: blur(8px);
+    filter: blur(2px);
     z-index: -1;
 }
 
