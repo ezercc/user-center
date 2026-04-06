@@ -83,21 +83,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (newPwd.length < 8) return Notifications.show(window.userI18n ? window.userI18n.password_too_short : '新密码需大于8位', 'warning');
         if (newPwd !== repeatPwd) return Notifications.show(window.userI18n ? window.userI18n.password_mismatch : '两次新密码输入不一致', 'warning');
 
-        // 使用 Supabase 的内置“原密码验证”功能 (需在后台开启)
+        // 直接使用 Supabase 的 updateUser 功能并传递 current_password (见后台文档)
         Notifications.show(window.userI18n ? window.userI18n.updating_password : '正在提交修改...', 'info');
 
         try {
-            const { error: updateError } = await client.auth.updateUser({ 
+            // 已登录用户修改密码，凭借 current_password 验证即可，无需验证码
+            const { error: updateError } = await client.auth.updateUser({
                 password: newPwd,
-                old_password: oldPwd 
+                current_password: oldPwd
             });
 
             if (updateError) {
                 console.error('Password update failed:', updateError);
                 let errMsg = updateError.message;
-
-                // 如果是原密码错误，显示更友好的提示 (大小写无关)
                 const errLower = updateError.message.toLowerCase();
+
+                // 只有当确认为密码错误时才显示转换后的提示，否则显示原始错误
                 if (errLower.includes('current password') || errLower.includes('invalid password')) {
                     errMsg = window.userI18n ? window.userI18n.password_error : '原密码错误，请重新输入';
                 }
@@ -108,7 +109,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pwdForm.reset();
             }
         } catch (err) {
-            Notifications.show(err.message || '修改失败', 'error');
+            if (err === 'Captcha closed') return;
+            Notifications.show(err.message || '操作失败', 'error');
         }
     });
 
