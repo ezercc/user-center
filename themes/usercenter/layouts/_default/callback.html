@@ -7,17 +7,38 @@
     <title>{{ T "redirecting_title" | default "正在跳转..." }}</title>
     <link rel="shortcut icon" href="{{ $.Site.Params.images.favicon }}">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="{{ absURL " js/common.js"}}"></script>
+    <script src="{{ absURL "js/common.js"}}"></script>
 </head>
 
 <body>
     {{ T "redirecting_msg" | default "正在跳转，请稍候..." }}
     <script type="text/javascript">
-        setTimeout(() => {
+        let redirected = false;
+        const doRedirect = () => {
+            if (redirected) return;
+            redirected = true;
             const params = new URLSearchParams(window.location.search);
             const redirect = params.get('redirect');
-            if (redirect && redirect.includes('ezer.cc')) window.location.href = redirect;
-            else window.location.href = "/";
-        }, 1000);
+            if (redirect && redirect.includes('ezer.cc')) {
+                window.location.href = redirect;
+            } else {
+                window.location.href = "/";
+            }
+        };
+
+        if (typeof client !== 'undefined') {
+            client.auth.onAuthStateChange((event, session) => {
+                console.log("Callback Auth Event:", event);
+                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+                    if (session) {
+                        doRedirect();
+                    }
+                }
+            });
+            // 2 seconds safety fallback
+            setTimeout(doRedirect, 2000);
+        } else {
+            doRedirect();
+        }
     </script>
 </body>
