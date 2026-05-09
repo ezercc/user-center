@@ -323,7 +323,7 @@ function executeCaptcha() {
         loader.className = 'captcha-loader';
         loader.innerHTML = `
             <div class="spinner"></div>
-            <span>安全连接中...</span>
+            <span>正在加载验证组件...</span>
         `;
         box.appendChild(loader);
 
