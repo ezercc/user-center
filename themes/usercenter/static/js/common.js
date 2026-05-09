@@ -270,25 +270,84 @@ function getLoginUrl(redirectPath = '/') {
 window.getLoginUrl = getLoginUrl;
 
 // ----------------------------------------------------------------
-// 人机验证 (hCaptcha)
+// 人机验证 (Cloudflare Turnstile)
 // ----------------------------------------------------------------
-const SITE_KEY = 'ea4ad0ce-1bf0-4b58-be28-3730062ac914';
+const SITE_KEY = '0x4AAAAAADMD3poPSTGFvxsO';
 
 function executeCaptcha() {
     return new Promise((resolve, reject) => {
+        // 动态注入加载器样式
+        if (!document.getElementById('captcha-loader-style')) {
+            const style = document.createElement('style');
+            style.id = 'captcha-loader-style';
+            style.innerHTML = `
+                .captcha-box-loading {
+                    position: relative;
+                    min-width: 320px;
+                    min-height: 90px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .captcha-loader {
+                    position: absolute;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 10px;
+                    color: var(--text-secondary);
+                    font-size: 13px;
+                    pointer-events: none;
+                }
+                .captcha-loader .spinner {
+                    width: 24px;
+                    height: 24px;
+                    border: 3px solid var(--border-color);
+                    border-top-color: var(--primary-color);
+                    border-radius: 50%;
+                    animation: captcha-spin 0.8s linear infinite;
+                }
+                @keyframes captcha-spin {
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         const overlay = document.createElement('div');
         overlay.className = 'captcha-overlay';
         const box = document.createElement('div');
-        box.className = 'captcha-box';
+        box.className = 'captcha-box captcha-box-loading';
+
+        const loader = document.createElement('div');
+        loader.className = 'captcha-loader';
+        loader.innerHTML = `
+            <div class="spinner"></div>
+            <span>安全连接中...</span>
+        `;
+        box.appendChild(loader);
+
         const captchaDiv = document.createElement('div');
-        const uniqueId = 'h-captcha-' + Date.now();
+        const uniqueId = 'turnstile-' + Date.now();
         captchaDiv.id = uniqueId;
+        captchaDiv.style.position = 'relative';
+        captchaDiv.style.zIndex = '2';
         box.appendChild(captchaDiv);
+
         overlay.appendChild(box);
         document.body.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('active'));
 
-        if (!window.hcaptcha) {
+        // 点击遮罩层可以关闭验证
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
+                setTimeout(() => overlay.remove(), 300);
+                reject('Captcha closed');
+            }
+        });
+
+        if (!window.turnstile) {
             const msg = (window.i18n && window.i18n.captcha_load_failed) ||
                 (window.userI18n && window.userI18n.captcha_load_failed) ||
                 '验证组件加载失败';
@@ -297,8 +356,11 @@ function executeCaptcha() {
         }
 
         try {
-            window.hcaptcha.render(uniqueId, {
+            window.turnstile.render(captchaDiv, {
                 sitekey: SITE_KEY,
+                'before-interactive-callback': () => {
+                    loader.style.display = 'none';
+                },
                 callback: (token) => {
                     overlay.classList.remove('active');
                     setTimeout(() => overlay.remove(), 300);
@@ -309,10 +371,15 @@ function executeCaptcha() {
                         (window.userI18n && window.userI18n.captcha_failed) ||
                         '验证失败';
                     Notifications.show(msg, 'error');
-                    overlay.remove(); reject('Captcha error');
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 300);
+                    reject('Captcha error');
                 },
-                'close-callback': () => {
-                    overlay.remove(); reject('Captcha closed');
+                'expired-callback': () => {
+                    Notifications.show('验证已过期，请重试', 'warning');
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 300);
+                    reject('Captcha expired');
                 }
             });
         } catch (e) {
