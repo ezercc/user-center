@@ -1,6 +1,4 @@
-// static/js/invite.js
-
-document.addEventListener('DOMContentLoaded', async () => {
+async function initInviteModule() {
     if (typeof client === 'undefined') {
         console.error('Supabase client not initialized. Make sure common.js is loaded.');
         return;
@@ -15,8 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const user = session.user;
     let inviteCode = '';
-    
-    console.log('[Invite] DOMContentLoaded. Current User ID:', user.id, 'Email:', user.email);
+
+    console.log('[Invite] DOMContentLoaded/Direct init. Current User ID:', user.id, 'Email:', user.email);
 
     // 初始化加载
     try {
@@ -47,11 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!profile || !profile.invitation_code) {
             console.log('User has no invitation code, generating one dynamically...');
             inviteCode = generateRandomInviteCode();
-            
+
             // 存入 profiles 数据库 (使用 upsert 兼容无 Profile 记录的极端情况)
             const { error: updateError } = await client
                 .from('profiles')
-                .upsert({ 
+                .upsert({
                     id: user.id,
                     email: user.email,
                     invitation_code: inviteCode
@@ -69,14 +67,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // B. 渲染邀请码与邀请链接
         const codeDisplay = document.getElementById('invite-code-display');
         const linkInput = document.getElementById('invite-link-input');
-        
+
         if (codeDisplay) codeDisplay.textContent = inviteCode;
-        
+
         // 动态构建链接：兼容多语言子路径以及本地和生产环境
         const isEn = window.location.pathname.startsWith('/en/');
         const baseLoginUrl = isEn ? `${window.location.origin}/en/login/` : `${window.location.origin}/login/`;
         const fullInviteLink = `${baseLoginUrl}?aff=${inviteCode}`;
-        
+
         if (linkInput) {
             linkInput.value = fullInviteLink;
         }
@@ -133,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showCopiedState(btn) {
         const origText = btn.querySelector('.btn-text');
         const origIcon = btn.querySelector('.btn-icon');
-        
+
         if (!origText || !origIcon) return;
 
         const prevText = origText.textContent;
@@ -229,13 +227,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!email) return '***';
         const atIndex = email.indexOf('@');
         if (atIndex === -1) return email;
-        
+
         const username = email.substring(0, atIndex);
         const domain = email.substring(atIndex);
-        
+
         if (username.length <= 2) {
             return username + '***' + domain;
         }
         return username.substring(0, 2) + '***' + domain;
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInviteModule);
+} else {
+    initInviteModule();
+}
