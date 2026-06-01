@@ -15,17 +15,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const user = session.user;
     let inviteCode = '';
+    
+    console.log('[Invite] DOMContentLoaded. Current User ID:', user.id, 'Email:', user.email);
 
     // 初始化加载
     try {
         await initInvitePage();
     } catch (err) {
-        console.error('Failed to initialize invite page:', err);
+        console.error('[Invite] Failed to initialize invite page:', err);
         Notifications.show('加载页面失败: ' + err.message, 'error');
     }
 
     // 初始化核心逻辑
     async function initInvitePage() {
+        console.log('[Invite] Fetching profile from database for ID:', user.id);
         // A. 从 profiles 表获取当前用户的邀请码
         let { data: profile, error: profileError } = await client
             .from('profiles')
@@ -33,9 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             .eq('id', user.id)
             .maybeSingle();
 
+        console.log('[Invite] Profile query result:', profile, 'Error:', profileError);
+
         if (profileError) {
-            console.error('Fetch profile failed:', profileError);
-            throw new Error('获取个人资料失败');
+            console.error('[Invite] Fetch profile failed:', profileError);
+            throw new Error('获取个人资料失败: ' + (profileError.message || JSON.stringify(profileError)));
         }
 
         // 如果用户目前没有邀请码 (比如历史老用户)，执行自愈逻辑生成一个
@@ -43,11 +48,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('User has no invitation code, generating one dynamically...');
             inviteCode = generateRandomInviteCode();
             
-            // 存入 profiles 数据库
+            // 存入 profiles 数据库 (使用 upsert 兼容无 Profile 记录的极端情况)
             const { error: updateError } = await client
                 .from('profiles')
-                .update({ invitation_code: inviteCode })
-                .eq('id', user.id);
+                .upsert({ 
+                    id: user.id,
+                    email: user.email,
+                    invitation_code: inviteCode
+                });
 
             if (updateError) {
                 console.error('Save generated invite code failed:', updateError);
@@ -151,6 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const container = document.getElementById('referred-users-container');
         if (!container) return;
 
+        console.log('[Invite] Querying referred users where referred_by =', code);
         // 查询 profiles 表中所有以该用户的邀请码作为 referred_by 的记录
         const { data: users, error } = await client
             .from('profiles')
@@ -158,9 +167,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             .eq('referred_by', code)
             .order('created_at', { ascending: false });
 
+        console.log('[Invite] Referred users query result:', users, 'Error:', error);
+
         if (error) {
-            console.error('Query referred users failed:', error);
-            container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4f;">加载受邀人数据失败</div>`;
+            console.error('[Invite] Query referred users failed:', error);
+            container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4f;">加载受邀人数据失败: ${error.message || JSON.stringify(error)}</div>`;
             return;
         }
 
