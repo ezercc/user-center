@@ -17,10 +17,10 @@
                         <div class="invite-code-display" id="invite-code-display">--------</div>
                         <div class="pulse-ring"></div>
                     </div>
-                    <p class="text-secondary hint-text">{{ T "invite_friends_hint" | default "分享您的邀请码或专属链接，邀请新朋友注册加入 Ezer" }}</p>
+                    <p class="text-secondary hint-text">{{ T "invite_friends_hint" }}</p>
                     
                     <div class="link-copy-container">
-                        <input type="text" id="invite-link-input" readonly value="Loading invite link...">
+                        <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
                         <button class="btn-primary" id="btn-copy-link">
                             <span class="material-icons-round btn-icon">content_copy</span>
                             <span class="btn-text">{{ T "copy_invite_link" }}</span>
@@ -245,7 +245,9 @@
         no_invited_users: '{{ T "no_invited_users" | default "你还没有邀请过任何好友，快去分享链接吧！" }}',
         invite_code_not_found: '{{ T "invite_code_not_found" | default "未获取到邀请码，请稍后再试" }}',
         reg_email: '{{ T "reg_email" | default "注册邮箱" }}',
-        reg_date: '{{ T "reg_date" | default "注册日期" }}'
+        reg_date: '{{ T "reg_date" | default "注册日期" }}',
+        auto_assign_invite_code_failed: '{{ T "auto_assign_invite_code_failed" | default "自动分配邀请码失败，请刷新重试。" }}',
+        load_referred_users_failed: '{{ T "load_referred_users_failed" | default "加载受邀人数据失败" }}'
     };
 </script>
 <script src="{{ absURL "js/invite.js"}}"></script>

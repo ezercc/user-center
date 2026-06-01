@@ -313,4 +313,16 @@ other = "未获取到邀请码，请稍后再试"
 [copied]
 other = "已复制"
 
+[invite_friends_hint]
+other = "分享您的邀请码或专属链接，邀请新朋友注册加入 Ezer"
+
+[loading_invite_link]
+other = "正在加载邀请链接..."
+
+[auto_assign_invite_code_failed]
+other = "自动分配邀请码失败，请刷新重试。"
+
+[load_referred_users_failed]
+other = "加载受邀人数据失败"
+
 

@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (updateError) {
                 console.error('Save generated invite code failed:', updateError);
-                Notifications.show('自动分配邀请码失败，请刷新重试。', 'error');
+                Notifications.show(window.inviteI18n && window.inviteI18n.auto_assign_invite_code_failed ? window.inviteI18n.auto_assign_invite_code_failed : '自动分配邀请码失败，请刷新重试。', 'error');
                 return;
             }
         } else {
@@ -169,7 +169,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (error) {
             console.error('[Invite] Query referred users failed:', error);
-            container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4f;">加载受邀人数据失败: ${error.message || JSON.stringify(error)}</div>`;
+            const failText = window.inviteI18n && window.inviteI18n.load_referred_users_failed ? window.inviteI18n.load_referred_users_failed : '加载受邀人数据失败';
+            container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4f;">${failText}: ${error.message || JSON.stringify(error)}</div>`;
             return;
         }
 

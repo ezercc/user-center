@@ -313,4 +313,16 @@ other = "Invitation code not found, please try again later"
 [copied]
 other = "Copied"
 
+[invite_friends_hint]
+other = "Share your invitation code or link to invite friends to join Ezer"
+
+[loading_invite_link]
+other = "Loading invite link..."
+
+[auto_assign_invite_code_failed]
+other = "Failed to dynamically assign invitation code, please refresh and try again."
+
+[load_referred_users_failed]
+other = "Failed to load referred users data"
+
 
