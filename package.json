@@ -1,0 +1,8 @@
+{
+  "name": "ezer-user-center",
+  "version": "1.0.0",
+  "description": "Ezer User Center",
+  "scripts": {
+    "build": "if [ \"$VERCEL_ENV\" = \"production\" ] || [ -z \"$VERCEL_URL\" ]; then hugo; else hugo -b https://$VERCEL_URL; fi"
+  }
+}

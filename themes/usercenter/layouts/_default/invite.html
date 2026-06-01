@@ -49,7 +49,8 @@
 
 <style>
     /* 邀请码专属高级视觉设计 */
-    .invite-code-card {
+    .invite-code-card, .referred-list-card {
+        height: 400px;
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -154,7 +155,25 @@
     /* 表格与列表高级样式 */
     .table-responsive {
         width: 100%;
+        height: 345px;
         overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    /* 极细高级定制滚动条 */
+    .table-responsive::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
     }
 
     .invite-table {

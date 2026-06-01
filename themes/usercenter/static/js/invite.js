@@ -1,4 +1,4 @@
-async function initInviteModule() {
+document.addEventListener('DOMContentLoaded', async () => {
     if (typeof client === 'undefined') {
         console.error('Supabase client not initialized. Make sure common.js is loaded.');
         return;
@@ -14,7 +14,7 @@ async function initInviteModule() {
     const user = session.user;
     let inviteCode = '';
 
-    console.log('[Invite] DOMContentLoaded/Direct init. Current User ID:', user.id, 'Email:', user.email);
+    console.log('[Invite] DOMContentLoaded. Current User ID:', user.id, 'Email:', user.email);
 
     // 初始化加载
     try {
@@ -236,10 +236,4 @@ async function initInviteModule() {
         }
         return username.substring(0, 2) + '***' + domain;
     }
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initInviteModule);
-} else {
-    initInviteModule();
-}
+});
