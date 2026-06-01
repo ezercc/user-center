@@ -131,6 +131,18 @@
                 </div>
             </div>
 
+            <div id="step-register-success" class="auth-step">
+                <div class="success-message" style="line-height: 1.6; margin-bottom: 24px; font-size: 14px; color: var(--text-color);">
+                    {{ T "register_success_message" | safeHTML }}
+                    <div style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); opacity: 0.8;">
+                        {{ T "junk_mail_hint" }}
+                    </div>
+                </div>
+                <div class="actions-right mt-4">
+                    <button class="btn-primary" id="btn-success-login" style="width: 100%; text-align: center; border-radius: 20px;">{{ T "activated_go_login_btn" }}</button>
+                </div>
+            </div>
+
             <div id="step-forgot" class="auth-step">
                 <div class="input-group">
                     <input type="email" id="forgot-email" required placeholder=" ">
@@ -172,6 +184,8 @@
             subtitle_forgot: '{{ T "find_account_subtitle" }}',
             title_update: '{{ T "reset_password_title" }}',
             subtitle_update: '{{ T "enter_new_password_subtitle" }}',
+            title_register_success: '{{ T "verify_email_title" }}',
+            subtitle_register_success: '{{ T "verify_email_subtitle" }}',
             please_enter_email: '{{ T "please_enter_email" }}',
             invalid_email_format: '{{ T "invalid_email_format" }}',
             login_success: '{{ T "login_success" }}',

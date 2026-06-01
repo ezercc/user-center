@@ -270,3 +270,19 @@ other = "Verification successful, please set a new password"
 
 [recovery_interception_msg]
 other = "Please set your new password"
+
+[verify_email_title]
+other = "Verify your email"
+
+[verify_email_subtitle]
+other = "Activation email sent"
+
+[register_success_message]
+other = "We have sent an email to your address <span id=\"register-success-email\" style=\"font-weight: 600; color: var(--primary-color);\">mail@example.com</span>. Please click the confirmation link in the email to activate your account."
+
+[junk_mail_hint]
+other = "*Note: Please remember to check your spam/junk folder."
+
+[activated_go_login_btn]
+other = "Activated, Go to Login"
+

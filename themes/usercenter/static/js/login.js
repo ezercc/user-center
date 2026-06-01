@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         password: document.getElementById('step-password'),
         register: document.getElementById('step-register'),
         forgot: document.getElementById('step-forgot'), // 请求邮件页
-        update: document.getElementById('step-update-password') // 设置新密码页
+        update: document.getElementById('step-update-password'), // 设置新密码页
+        registerSuccess: document.getElementById('step-register-success') // 注册成功激活提示页
     };
 
     const elements = {
@@ -74,6 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (stepName === 'update') {
             elements.title.textContent = window.i18n ? window.i18n.title_update : '重置密码';
             elements.subtitle.textContent = window.i18n ? window.i18n.subtitle_update : '请输入新的安全密码';
+        } else if (stepName === 'registerSuccess') {
+            elements.title.textContent = window.i18n ? window.i18n.title_register_success : '验证您的邮箱';
+            elements.subtitle.textContent = window.i18n ? window.i18n.subtitle_register_success : '已发送激活邮件';
         }
     }
 
@@ -223,12 +227,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             if (error) throw error;
-            Notifications.show(window.i18n ? window.i18n.registration_success : '注册成功！请查收验证邮件', 'success');
-            setTimeout(() => { elements.inputEmail.value = email; switchStep('email'); }, 3000);
+            currentEmail = email;
+            const successEmailEl = document.getElementById('register-success-email');
+            if (successEmailEl) successEmailEl.textContent = email;
+            switchStep('registerSuccess');
         } catch (err) {
             if (err !== 'Captcha closed') Notifications.show(err.message, 'error');
         }
     });
+
+    // 已激活，去登录
+    const btnSuccessLogin = document.getElementById('btn-success-login');
+    if (btnSuccessLogin) {
+        btnSuccessLogin.addEventListener('click', () => {
+            if (currentEmail) {
+                elements.inputEmail.value = currentEmail;
+                switchStep('password');
+            } else {
+                switchStep('email');
+            }
+        });
+    }
 
     // ============================================================
     // 重置密码逻辑

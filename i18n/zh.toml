@@ -270,3 +270,19 @@ other = "验证成功，请设置新密码"
 
 [recovery_interception_msg]
 other = "请设置您的新密码"
+
+[verify_email_title]
+other = "验证您的邮箱"
+
+[verify_email_subtitle]
+other = "已发送激活邮件"
+
+[register_success_message]
+other = "我们向您的邮箱 <span id=\"register-success-email\" style=\"font-weight: 600; color: var(--primary-color);\">mail@example.com</span> 发送了一封邮件，请点击邮件中的确认链接激活您的账号。"
+
+[junk_mail_hint]
+other = "*注意：请记得检查垃圾收件箱。"
+
+[activated_go_login_btn]
+other = "已激活，去登录"
+
