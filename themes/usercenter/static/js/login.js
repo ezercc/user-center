@@ -43,6 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         elements.regInviteCode.parentElement.classList.add('filled');
     }
 
+    // 支持直接从链接跳转至注册状态（极大提升新用户转化率）
+    const stepParam = urlParams.get('step');
+    if (stepParam === 'register' && !isRecoveryFlow) {
+        switchStep('register');
+    }
+
     // 获取重定向 URL
     function getRedirectUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -206,9 +212,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const provider = e.currentTarget.getAttribute('data-provider');
             try {
                 const token = await executeCaptcha();
+                const oauthOptions = {
+                    captchaToken: token,
+                    redirectTo: getRedirectUrl()
+                };
+
+                // 如果 URL 中带有邀请码，封装到 options.data 中传递给第三方登录，绑定为新用户的推荐人
+                if (affCode) {
+                    oauthOptions.data = {
+                        referred_by: affCode.trim()
+                    };
+                }
+
                 await client.auth.signInWithOAuth({
                     provider: provider,
-                    options: { captchaToken: token, redirectTo: getRedirectUrl() }
+                    options: oauthOptions
                 });
             } catch (err) { if (err !== 'Captcha closed') Notifications.show(err.message, 'error'); }
         });

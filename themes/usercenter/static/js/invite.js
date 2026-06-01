@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 动态构建链接：兼容多语言子路径以及本地和生产环境
         const isEn = window.location.pathname.startsWith('/en/');
         const baseLoginUrl = isEn ? `${window.location.origin}/en/login/` : `${window.location.origin}/login/`;
-        const fullInviteLink = `${baseLoginUrl}?aff=${inviteCode}`;
+        const fullInviteLink = `${baseLoginUrl}?aff=${inviteCode}&step=register`;
 
         if (linkInput) {
             linkInput.value = fullInviteLink;
