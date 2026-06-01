@@ -31,8 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         subtitle: document.getElementById('auth-subtitle'),
         // 新密码输入框
         newPwd: document.getElementById('new-password'),
-        newPwdConfirm: document.getElementById('new-password-confirm')
+        newPwdConfirm: document.getElementById('new-password-confirm'),
+        regInviteCode: document.getElementById('reg-invite-code')
     };
+
+    // 解析 URL 中的邀请码 (aff)
+    const urlParams = new URLSearchParams(window.location.search);
+    const affCode = urlParams.get('aff');
+    if (affCode && elements.regInviteCode) {
+        elements.regInviteCode.value = affCode.trim();
+        elements.regInviteCode.parentElement.classList.add('filled');
+    }
 
     // 获取重定向 URL
     function getRedirectUrl() {
@@ -210,6 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const email = elements.regEmail.value.trim();
         const pwd = document.getElementById('reg-password').value;
         const pwdR = document.getElementById('reg-password-repeat').value;
+        const inviteCode = elements.regInviteCode ? elements.regInviteCode.value.trim() : '';
 
         if (!email) return Notifications.show(window.i18n ? window.i18n.please_enter_email : '请输入电子邮箱', 'warning');
         if (!/^\S+@\S+\.\S+$/.test(email)) return Notifications.show(window.i18n ? window.i18n.invalid_email_format : '邮箱格式不正确', 'warning');
@@ -218,14 +228,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const token = await executeCaptcha();
-            const { error } = await client.auth.signUp({
+            const signUpData = {
                 email: email,
                 password: pwd,
                 options: {
                     captchaToken: token,
                     emailRedirectTo: getRedirectUrl()
                 }
-            });
+            };
+            if (inviteCode) {
+                signUpData.options.data = {
+                    referred_by: inviteCode
+                };
+            }
+            const { error } = await client.auth.signUp(signUpData);
             if (error) throw error;
             currentEmail = email;
             const successEmailEl = document.getElementById('register-success-email');

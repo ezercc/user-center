@@ -178,6 +178,9 @@ other = "确认密码"
 [password_hint]
 other = "*密码需不少于8位，且包含大小写字母和特殊字符"
 
+[invitation_code_label]
+other = "邀请码 (选填)"
+
 [already_have_account_btn]
 other = "已有账号？登录"
 
@@ -285,4 +288,29 @@ other = "*注意：请记得检查垃圾收件箱。"
 
 [activated_go_login_btn]
 other = "已激活，去登录"
+
+[invite_friends]
+other = "邀请好友"
+
+[your_invite_code]
+other = "您的专属邀请码"
+
+[copy_invite_link]
+other = "复制邀请链接"
+
+[invite_link_copied]
+other = "邀请链接已复制到剪贴板！"
+
+[invited_users_list]
+other = "已成功邀请的好友"
+
+[no_invited_users]
+other = "您还没有邀请过任何好友，快去分享链接吧！"
+
+[invite_code_not_found]
+other = "未获取到邀请码，请稍后再试"
+
+[copied]
+other = "已复制"
+
 
