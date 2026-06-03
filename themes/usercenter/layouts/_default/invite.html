@@ -21,6 +21,19 @@
                         </div>
                         <p class="text-secondary hint-text">{{ T "invite_friends_hint" }}</p>
                         
+                        <!-- 邀请规则板块 -->
+                        <div class="invite-rules-box">
+                            <div class="rules-title">
+                                <span class="material-icons-round rules-title-icon">info</span>
+                                {{ T "invite_rules_title" }}
+                            </div>
+                            <ul class="rules-list">
+                                <li>{{ T "invite_rules_item_1" | safeHTML }}</li>
+                                <li>{{ T "invite_rules_item_2" | safeHTML }}</li>
+                                <li>{{ T "invite_rules_item_3" | safeHTML }}</li>
+                            </ul>
+                        </div>
+                        
                         <div class="link-copy-container">
                             <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
                             <button class="btn-primary" id="btn-copy-link">
@@ -111,7 +124,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 6px 12px;
+        padding: 12px 16px;
         background: rgba(26, 115, 232, 0.04);
         border-radius: 8px;
         border: 1px dashed rgba(26, 115, 232, 0.3);
@@ -125,13 +138,13 @@
     }
 
     .invite-code-display {
-        font-size: 24px;
-        font-weight: 700;
-        letter-spacing: 2px;
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: 4px;
         color: var(--primary-color);
         font-family: 'Outfit', 'Inter', monospace;
         z-index: 2;
-        text-shadow: 0 0 10px rgba(26, 115, 232, 0.15);
+        text-shadow: 0 0 12px rgba(26, 115, 232, 0.25);
     }
 
     .pulse-ring {
@@ -153,9 +166,54 @@
 
     .hint-text {
         text-align: center;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
         font-size: 13px;
         line-height: 1.4;
+    }
+
+    /* 邀请规则样式 */
+    .invite-rules-box {
+        background: rgba(0, 0, 0, 0.015);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+    [data-theme="dark"] .invite-rules-box {
+        background: rgba(255, 255, 255, 0.015);
+    }
+
+    .rules-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .rules-title-icon {
+        font-size: 16px;
+        color: var(--primary-color);
+    }
+
+    .rules-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .rules-list li {
+        margin-bottom: 6px;
+    }
+    
+    .rules-list li:last-child {
+        margin-bottom: 0;
     }
 
     /* 链接与复制栏设计 */

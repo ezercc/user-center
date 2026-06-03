@@ -340,5 +340,17 @@ other = "No expiring quota soon"
 [uses_expire_format]
 other = "{uses} uses will expire in {days} days"
 
+[invite_rules_title]
+other = "Referral Rules"
+
+[invite_rules_item_1]
+other = "<strong>New User Benefit</strong>: New users registered with an invite code receive <strong>3 extra</strong> uses."
+
+[invite_rules_item_2]
+other = "<strong>Inviter Reward</strong>: For every successful referral, you receive <strong>5 extra</strong> uses as a reward."
+
+[invite_rules_item_3]
+other = "<strong>Deduction Order</strong>: Referral rewards are valid for 1 month from the date of successful invitation. Standard monthly free quota is consumed first. Once exhausted, your referral rewards will be automatically used."
+
 
 

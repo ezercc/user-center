@@ -340,5 +340,17 @@ other = "暂无即将过期的额度"
 [uses_expire_format]
 other = "{uses} 次将于 {days} 天后过期"
 
+[invite_rules_title]
+other = "邀请规则"
+
+[invite_rules_item_1]
+other = "<strong>新用户福利</strong>：使用邀请码注册的新用户，可获得 <strong>3次</strong> 额外额度。"
+
+[invite_rules_item_2]
+other = "<strong>邀请人奖励</strong>：每成功邀请一位新用户注册，您将获得 <strong>5次</strong> 额外额度奖励。"
+
+[invite_rules_item_3]
+other = "<strong>额度扣减</strong>：邀请奖励在邀请成功后1个月内有效，系统会优先扣减每月的常规免费额度，消耗完毕后自动使用邀请奖励额度。"
+
 
 
