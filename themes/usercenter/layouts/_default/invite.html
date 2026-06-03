@@ -7,24 +7,50 @@
         <h1 class="page-title">{{ T "invite_friends" }}</h1>
 
         <div class="settings-grid">
-            <!-- 左侧卡片：专属邀请码与链接复制 -->
-            <div class="card invite-code-card">
-                <div class="card-header">
-                    <h3><span class="material-icons-round">card_giftcard</span> {{ T "your_invite_code" }}</h3>
-                </div>
-                <div class="card-body">
-                    <div class="code-box-wrapper">
-                        <div class="invite-code-display" id="invite-code-display">--------</div>
-                        <div class="pulse-ring"></div>
+            <!-- 左侧列：上下两个卡片 -->
+            <div class="invite-left-col">
+                <!-- 上方卡片：专属邀请码与链接复制 -->
+                <div class="card invite-code-card">
+                    <div class="card-header">
+                        <h3><span class="material-icons-round">card_giftcard</span> {{ T "your_invite_code" }}</h3>
                     </div>
-                    <p class="text-secondary hint-text">{{ T "invite_friends_hint" }}</p>
-                    
-                    <div class="link-copy-container">
-                        <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
-                        <button class="btn-primary" id="btn-copy-link">
-                            <span class="material-icons-round btn-icon">content_copy</span>
-                            <span class="btn-text">{{ T "copy_invite_link" }}</span>
-                        </button>
+                    <div class="card-body">
+                        <div class="code-box-wrapper-compact">
+                            <div class="invite-code-display" id="invite-code-display">--------</div>
+                            <div class="pulse-ring"></div>
+                        </div>
+                        <p class="text-secondary hint-text">{{ T "invite_friends_hint" }}</p>
+                        
+                        <div class="link-copy-container">
+                            <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
+                            <button class="btn-primary" id="btn-copy-link">
+                                <span class="material-icons-round btn-icon">content_copy</span>
+                                <span class="btn-text">{{ T "copy_invite_link" }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 下方卡片：使用次数统计 -->
+                <div class="card quota-stats-card">
+                    <div class="card-header">
+                        <h3><span class="material-icons-round">analytics</span> {{ T "quota_statistics" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-value" id="remaining-quota-display">-</div>
+                                <div class="stat-label">{{ T "remaining_uses" }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="accumulated-quota-display">-</div>
+                                <div class="stat-label">{{ T "accumulated_uses" }}</div>
+                            </div>
+                        </div>
+                        <div class="expiration-banner" id="expiration-banner" style="display: none;">
+                            <span class="material-icons-round info-icon">error_outline</span>
+                            <span class="expire-text" id="expiration-quota-text">-</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,46 +74,70 @@
 </main>
 
 <style>
-    /* 邀请码专属高级视觉设计 */
-    .invite-code-card, .referred-list-card {
-        height: 400px;
+    /* 邀请码与额度统计专属高级布局 */
+    .invite-left-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .invite-code-card {
+        height: 220px;
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .quota-stats-card {
+        height: 220px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .referred-list-card {
+        height: 460px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .invite-code-card .card-body, .quota-stats-card .card-body {
+        padding: 16px 24px;
+    }
     
-    .code-box-wrapper {
+    .code-box-wrapper-compact {
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 24px;
+        padding: 6px 12px;
         background: rgba(26, 115, 232, 0.04);
-        border-radius: 12px;
+        border-radius: 8px;
         border: 1px dashed rgba(26, 115, 232, 0.3);
-        margin-bottom: 16px;
+        margin-bottom: 8px;
         overflow: hidden;
     }
 
-    [data-theme="dark"] .code-box-wrapper {
+    [data-theme="dark"] .code-box-wrapper-compact {
         background: rgba(26, 115, 232, 0.08);
         border-color: rgba(26, 115, 232, 0.5);
     }
 
     .invite-code-display {
-        font-size: 38px;
+        font-size: 24px;
         font-weight: 700;
-        letter-spacing: 4px;
+        letter-spacing: 2px;
         color: var(--primary-color);
         font-family: 'Outfit', 'Inter', monospace;
         z-index: 2;
-        text-shadow: 0 0 20px rgba(26, 115, 232, 0.2);
+        text-shadow: 0 0 10px rgba(26, 115, 232, 0.15);
     }
 
     .pulse-ring {
         position: absolute;
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
         border: 2px solid var(--primary-color);
         border-radius: 50%;
         opacity: 0;
@@ -103,27 +153,27 @@
 
     .hint-text {
         text-align: center;
-        margin-bottom: 24px;
-        font-size: 14px;
-        line-height: 1.5;
+        margin-bottom: 8px;
+        font-size: 13px;
+        line-height: 1.4;
     }
 
     /* 链接与复制栏设计 */
     .link-copy-container {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
     }
 
     #invite-link-input {
         width: 100%;
-        height: 44px;
-        padding: 0 16px;
+        height: 38px;
+        padding: 0 12px;
         border: 1px solid var(--border-color);
-        border-radius: 10px;
+        border-radius: 8px;
         background: var(--input-bg);
         color: var(--text-secondary);
-        font-size: 13px;
+        font-size: 12px;
         outline: none;
         text-align: center;
         transition: border-color 0.2s;
@@ -137,25 +187,89 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
         width: 100%;
-        height: 46px;
-        border-radius: 23px;
+        height: 38px;
+        border-radius: 19px;
         font-weight: 500;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        font-size: 13px;
+        box-shadow: 0 4px 10px rgba(26, 115, 232, 0.15);
         transition: all 0.2s ease;
     }
 
     #btn-copy-link:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(26, 115, 232, 0.3);
+        box-shadow: 0 6px 14px rgba(26, 115, 232, 0.25);
+    }
+
+    /* 额度统计专属高级设计 */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .stat-box {
+        background: rgba(0, 0, 0, 0.015);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] .stat-box {
+        background: rgba(255, 255, 255, 0.025);
+    }
+
+    .stat-box:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.08);
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--primary-color);
+        font-family: 'Outfit', 'Inter', sans-serif;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+    }
+
+    .expiration-banner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 152, 0, 0.06);
+        border: 1px solid rgba(255, 152, 0, 0.15);
+        border-radius: 8px;
+        padding: 6px 12px;
+        color: #d84315;
+        font-size: 12px;
+        transition: all 0.2s ease;
+    }
+
+    [data-theme="dark"] .expiration-banner {
+        background: rgba(255, 152, 0, 0.1);
+        border-color: rgba(255, 152, 0, 0.25);
+        color: #ffb74d;
+    }
+
+    .expiration-banner .info-icon {
+        font-size: 16px;
     }
 
     /* 表格与列表高级样式 */
     .table-responsive {
         width: 100%;
-        height: 345px;
+        height: 405px;
         overflow-x: auto;
         overflow-y: auto;
     }
@@ -247,7 +361,12 @@
         reg_email: '{{ T "reg_email" | default "注册邮箱" }}',
         reg_date: '{{ T "reg_date" | default "注册日期" }}',
         auto_assign_invite_code_failed: '{{ T "auto_assign_invite_code_failed" | default "自动分配邀请码失败，请刷新重试。" }}',
-        load_referred_users_failed: '{{ T "load_referred_users_failed" | default "加载受邀人数据失败" }}'
+        load_referred_users_failed: '{{ T "load_referred_users_failed" | default "加载受邀人数据失败" }}',
+        quota_statistics: '{{ T "quota_statistics" | default "额度使用统计" }}',
+        remaining_uses: '{{ T "remaining_uses" | default "当前剩余使用次数" }}',
+        accumulated_uses: '{{ T "accumulated_uses" | default "累计获得次数" }}',
+        no_expiring_quota: '{{ T "no_expiring_quota" | default "暂无即将过期的额度" }}',
+        uses_expire_format: '{{ T "uses_expire_format" | default "{uses}次将于{days}天后过期" }}'
     };
 </script>
 <script src="{{ absURL "js/invite.js"}}"></script>

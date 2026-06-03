@@ -325,4 +325,20 @@ other = "自动分配邀请码失败，请刷新重试。"
 [load_referred_users_failed]
 other = "加载受邀人数据失败"
 
+[quota_statistics]
+other = "额度使用统计"
+
+[remaining_uses]
+other = "当前剩余使用次数"
+
+[accumulated_uses]
+other = "累计获得次数"
+
+[no_expiring_quota]
+other = "暂无即将过期的额度"
+
+[uses_expire_format]
+other = "{uses} 次将于 {days} 天后过期"
+
+
 

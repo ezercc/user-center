@@ -325,4 +325,20 @@ other = "Failed to dynamically assign invitation code, please refresh and try ag
 [load_referred_users_failed]
 other = "Failed to load referred users data"
 
+[quota_statistics]
+other = "Usage Quota Statistics"
+
+[remaining_uses]
+other = "Remaining Uses"
+
+[accumulated_uses]
+other = "Accumulated Uses"
+
+[no_expiring_quota]
+other = "No expiring quota soon"
+
+[uses_expire_format]
+other = "{uses} uses will expire in {days} days"
+
+
 

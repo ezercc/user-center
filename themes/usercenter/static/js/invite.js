@@ -84,6 +84,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // D. 载入被邀请好友列表
         await loadReferredUsers(inviteCode);
+
+        // E. 载入使用额度统计
+        await loadQuotaStatistics();
     }
 
     // 随机大写 8 位字符生成器 (自愈模式 fallback)
@@ -236,5 +239,141 @@ document.addEventListener('DOMContentLoaded', async () => {
             return username + '***' + domain;
         }
         return username.substring(0, 2) + '***' + domain;
+    }
+
+    // 查询并加载额度统计信息
+    async function loadQuotaStatistics() {
+        const remainingEl = document.getElementById('remaining-quota-display');
+        const accumulatedEl = document.getElementById('accumulated-quota-display');
+        const expireEl = document.getElementById('expiration-quota-text');
+        const expireBanner = document.getElementById('expiration-banner');
+
+        console.log('[Invite] Loading quota statistics for user:', user.id);
+
+        try {
+            // 1. 查询 profiles 个人资料（获取受邀人自身的注册激活时间及已用额度）
+            const { data: profile, error: profileError } = await client
+                .from('profiles')
+                .select('created_at, referred_by, invitee_quota_used')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            if (profileError) {
+                console.error('[Invite] Query profile for quota failed:', profileError);
+                throw profileError;
+            }
+
+            // 2. 查询 invitations 邀请奖励表
+            let invRecord = null;
+            try {
+                const { data, error: invError } = await client
+                    .from('invitations')
+                    .select('remaining_uses, accumulated_uses, expiration_dates')
+                    .eq('user_id', user.id)
+                    .maybeSingle();
+                
+                if (invError) {
+                    console.warn('[Invite] Query invitations table failed. It might not be created yet.', invError);
+                } else {
+                    invRecord = data;
+                }
+            } catch (err) {
+                console.warn('[Invite] Failed to fetch invitations records, assuming 0 rewards.', err);
+            }
+
+            const now = new Date();
+            let inviteeRemaining = 0;
+            let inviteeExpiresAt = null;
+
+            // A. 被邀请者额度计算：若有推荐人且在注册后 1 个月内，拥有 (3 - 已用) 次额度
+            if (profile) {
+                const regDate = new Date(profile.created_at);
+                const expireDate = new Date(regDate);
+                expireDate.setMonth(expireDate.getMonth() + 1);
+
+                if (profile.referred_by && expireDate > now) {
+                    inviteeRemaining = Math.max(0, 3 - (profile.invitee_quota_used || 0));
+                    inviteeExpiresAt = expireDate;
+                }
+            }
+
+            // B. 邀请人额度计算
+            let inviterRemaining = 0;
+            let inviterAccumulated = 0;
+            let inviterDates = [];
+
+            if (invRecord) {
+                inviterRemaining = invRecord.remaining_uses || 0;
+                inviterAccumulated = invRecord.accumulated_uses || 0;
+                inviterDates = invRecord.expiration_dates || [];
+            }
+
+            // C. 过滤出未过期的邀请人额度时间数组，并校正额度（防止数据库未清理时的时差）
+            const validInviterDates = inviterDates
+                .map(d => new Date(d))
+                .filter(d => d > now);
+
+            // 本地校正后的邀请人可用额度上限 = 有效未过期数量 * 5
+            const localMaxInviterQuota = validInviterDates.length * 5;
+            const correctedInviterRemaining = Math.min(inviterRemaining, localMaxInviterQuota);
+
+            // D. 汇总结果
+            const totalRemaining = inviteeRemaining + correctedInviterRemaining;
+            const totalAccumulated = inviterAccumulated + (profile && profile.referred_by ? 3 : 0);
+
+            if (remainingEl) remainingEl.textContent = totalRemaining;
+            if (accumulatedEl) accumulatedEl.textContent = totalAccumulated;
+
+            // E. 查找最先过期的额度
+            const expirationList = [];
+
+            // 如果被邀请人赠送额度还有剩余，将其过期时间加入列表
+            if (inviteeRemaining > 0 && inviteeExpiresAt) {
+                expirationList.push({
+                    date: inviteeExpiresAt,
+                    amount: inviteeRemaining
+                });
+            }
+
+            // 将所有有效的邀请人过期日期加入列表（每笔算 5 次或剩余的额度）
+            let tempRemaining = correctedInviterRemaining;
+            const sortedInviterDates = validInviterDates.sort((a, b) => a - b);
+            
+            sortedInviterDates.forEach(date => {
+                if (tempRemaining > 0) {
+                    const amount = Math.min(5, tempRemaining);
+                    expirationList.push({ date, amount });
+                    tempRemaining -= amount;
+                }
+            });
+
+            // 找出最早过期的那一笔
+            if (expirationList.length > 0) {
+                const soonest = expirationList.sort((a, b) => a.date - b.date)[0];
+                const diffTime = soonest.date - now;
+                const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+                let expireMsg = '';
+                if (window.inviteI18n && window.inviteI18n.uses_expire_format) {
+                    expireMsg = window.inviteI18n.uses_expire_format
+                        .replace('{uses}', soonest.amount)
+                        .replace('{days}', diffDays);
+                } else {
+                    expireMsg = `${soonest.amount}次将于${diffDays}天后过期`;
+                }
+
+                if (expireEl) expireEl.textContent = expireMsg;
+                if (expireBanner) expireBanner.style.display = 'flex';
+            } else {
+                if (expireEl) expireEl.textContent = window.inviteI18n ? window.inviteI18n.no_expiring_quota : '暂无即将过期的额度';
+                if (expireBanner) expireBanner.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('[Invite] Failed to process quota stats:', err);
+            if (remainingEl) remainingEl.textContent = '-';
+            if (accumulatedEl) accumulatedEl.textContent = '-';
+            if (expireEl) expireEl.textContent = '加载出错';
+            if (expireBanner) expireBanner.style.display = 'none';
+        }
     }
 });
