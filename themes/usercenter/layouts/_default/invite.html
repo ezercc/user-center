@@ -38,7 +38,8 @@
                             <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
                             <button class="btn-primary" id="btn-copy-link">
                                 <span class="material-icons-round btn-icon">content_copy</span>
-                                <span class="btn-text">{{ T "copy_invite_link" }}</span>
+                                <span class="btn-text-full">{{ T "copy_invite_link" }}</span>
+                                <span class="btn-text-short">{{ T "copy" }}</span>
                             </button>
                         </div>
                     </div>
@@ -99,6 +100,7 @@
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        container-type: inline-size;
     }
 
     .quota-stats-card {
@@ -212,12 +214,12 @@
     /* 链接与复制栏设计 */
     .link-copy-container {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
     }
 
     #invite-link-input {
-        width: 100%;
+        flex: 1;
         height: 38px;
         padding: 0 12px;
         border: 1px solid var(--border-color);
@@ -226,7 +228,7 @@
         color: var(--text-secondary);
         font-size: 12px;
         outline: none;
-        text-align: center;
+        text-align: left;
         transition: border-color 0.2s;
     }
 
@@ -239,11 +241,13 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        width: 100%;
+        padding: 0 16px;
         height: 38px;
-        border-radius: 19px;
+        border-radius: 8px;
         font-weight: 500;
         font-size: 13px;
+        white-space: nowrap;
+        flex-shrink: 0;
         box-shadow: 0 4px 10px rgba(26, 115, 232, 0.15);
         transition: all 0.2s ease;
     }
@@ -251,6 +255,36 @@
     #btn-copy-link:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 14px rgba(26, 115, 232, 0.25);
+    }
+
+    .btn-text-full {
+        display: inline;
+    }
+
+    .btn-text-short {
+        display: none;
+    }
+
+    /* 容器查询自适应复制按钮 */
+    @container (max-width: 380px) {
+        .btn-text-full {
+            display: none;
+        }
+        .btn-text-short {
+            display: inline;
+        }
+    }
+
+    @container (max-width: 290px) {
+        .btn-text-full, .btn-text-short {
+            display: none;
+        }
+        #btn-copy-link {
+            padding: 0;
+            width: 38px;
+            min-width: 38px;
+            justify-content: center;
+        }
     }
 
     /* 额度统计专属高级设计 */

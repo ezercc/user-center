@@ -296,7 +296,7 @@ other = "Invite Friends"
 other = "Your Invitation Code"
 
 [copy_invite_link]
-other = "Copy Invite Link"
+other = "Copy Link"
 
 [invite_link_copied]
 other = "Invite link copied to clipboard!"
@@ -312,6 +312,9 @@ other = "Invitation code not found, please try again later"
 
 [copied]
 other = "Copied"
+
+[copy]
+other = "Copy"
 
 [invite_friends_hint]
 other = "Share your invitation code or link to invite friends to join Ezer"
@@ -350,7 +353,7 @@ other = "<strong>New User Benefit</strong>: New users registered with an invite 
 other = "<strong>Inviter Reward</strong>: For every successful referral, you receive <strong>5 extra</strong> uses as a reward."
 
 [invite_rules_item_3]
-other = "<strong>Deduction Order</strong>: Referral rewards are valid for 1 month from the date of successful invitation. Standard monthly free quota is consumed first. Once exhausted, your referral rewards will be automatically used."
+other = "<strong>Deduction Order</strong>: Referral rewards are valid for <strong>1 month</strong> from the date of successful invitation. Standard monthly free quota is consumed first. Once exhausted, your referral rewards will be automatically used."
 
 
 

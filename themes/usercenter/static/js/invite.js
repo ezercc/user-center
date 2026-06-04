@@ -133,15 +133,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 变换复制按钮状态动画
     function showCopiedState(btn) {
-        const origText = btn.querySelector('.btn-text');
+        const origTextFull = btn.querySelector('.btn-text-full');
+        const origTextShort = btn.querySelector('.btn-text-short');
         const origIcon = btn.querySelector('.btn-icon');
 
-        if (!origText || !origIcon) return;
+        if (!origTextFull || !origTextShort || !origIcon) return;
 
-        const prevText = origText.textContent;
+        const prevTextFull = origTextFull.textContent;
+        const prevTextShort = origTextShort.textContent;
         const prevIconText = origIcon.textContent;
 
-        origText.textContent = window.inviteI18n ? window.inviteI18n.copied : '已复制';
+        const copiedText = window.inviteI18n ? window.inviteI18n.copied : '已复制';
+        origTextFull.textContent = copiedText;
+        origTextShort.textContent = copiedText;
         origIcon.textContent = 'check';
         btn.style.background = '#4caf50';
         btn.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.3)';
@@ -149,7 +153,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         Notifications.show(window.inviteI18n ? window.inviteI18n.invite_link_copied : '邀请链接已复制到剪贴板！', 'success');
 
         setTimeout(() => {
-            origText.textContent = prevText;
+            origTextFull.textContent = prevTextFull;
+            origTextShort.textContent = prevTextShort;
             origIcon.textContent = prevIconText;
             btn.style.background = '';
             btn.style.boxShadow = '';
