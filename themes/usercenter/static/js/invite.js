@@ -70,10 +70,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (codeDisplay) codeDisplay.textContent = inviteCode;
 
-        // 动态构建链接：兼容多语言子路径以及本地和生产环境
+        // 动态构建链接：指向产品落地页，并支持多语言
         const isEn = window.location.pathname.startsWith('/en/');
-        const baseLoginUrl = isEn ? `${window.location.origin}/en/login/` : `${window.location.origin}/login/`;
-        const fullInviteLink = `${baseLoginUrl}?aff=${inviteCode}&step=register`;
+        const fullInviteLink = isEn 
+            ? `https://audit.ezer.cc/en/?aff=${inviteCode}`
+            : `https://audit.ezer.cc/?aff=${inviteCode}`;
 
         if (linkInput) {
             linkInput.value = fullInviteLink;
