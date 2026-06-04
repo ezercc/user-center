@@ -55,12 +55,15 @@
                 </button>
             </div>
             <div class="sidebar-menu">
-                <a href="{{ "/" | relLangURL }}" class="sidebar-item">
+                <a href="{{ "/" | relLangURL }}" class="sidebar-item {{ if eq .RelPermalink ("/" | relLangURL) }}active{{ end }}">
                     <span class="material-icons-round">settings</span>{{ T "account_settings" | default "账号设置" }}
                 </a>
-                <a href="{{ "/message/" | relLangURL }}" class="sidebar-item active" id="nav-message-link">
+                <a href="{{ "/message/" | relLangURL }}" class="sidebar-item {{ if in .RelPermalink "/message/" }}active{{ end }}" id="nav-message-link">
                     <span class="material-icons-round">mail</span>{{ T "private_message" | default "私信消息" }}
                     <span class="sidebar-badge" id="sidebar-unread-dot"></span>
+                </a>
+                <a href="{{ "/invite/" | relLangURL }}" class="sidebar-item {{ if in .RelPermalink "/invite/" }}active{{ end }}" id="nav-invite-link">
+                    <span class="material-icons-round">group_add</span>{{ T "invite_friends" | default "邀请好友" }}
                 </a>
             </div>
         </aside>

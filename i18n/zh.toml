@@ -178,6 +178,9 @@ other = "确认密码"
 [password_hint]
 other = "*密码需不少于8位，且包含大小写字母和特殊字符"
 
+[invitation_code_label]
+other = "邀请码 (选填)"
+
 [already_have_account_btn]
 other = "已有账号？登录"
 
@@ -285,4 +288,72 @@ other = "*注意：请记得检查垃圾收件箱。"
 
 [activated_go_login_btn]
 other = "已激活，去登录"
+
+[invite_friends]
+other = "邀请好友"
+
+[your_invite_code]
+other = "您的专属邀请码"
+
+[copy_invite_link]
+other = "复制链接"
+
+[invite_link_copied]
+other = "邀请链接已复制到剪贴板！"
+
+[invited_users_list]
+other = "已成功邀请的好友"
+
+[no_invited_users]
+other = "您还没有邀请过任何好友，快去分享链接吧！"
+
+[invite_code_not_found]
+other = "未获取到邀请码，请稍后再试"
+
+[copied]
+other = "已复制"
+
+[copy]
+other = "复制"
+
+[invite_friends_hint]
+other = "分享您的邀请码或专属链接，邀请新朋友注册加入 Ezer"
+
+[loading_invite_link]
+other = "正在加载邀请链接..."
+
+[auto_assign_invite_code_failed]
+other = "自动分配邀请码失败，请刷新重试。"
+
+[load_referred_users_failed]
+other = "加载受邀人数据失败"
+
+[quota_statistics]
+other = "额度使用统计"
+
+[remaining_uses]
+other = "当前剩余使用次数"
+
+[accumulated_uses]
+other = "累计获得次数"
+
+[no_expiring_quota]
+other = "暂无即将过期的额度"
+
+[uses_expire_format]
+other = "{uses} 次将于 {days} 天后过期"
+
+[invite_rules_title]
+other = "邀请规则"
+
+[invite_rules_item_1]
+other = "<strong>新用户福利</strong>：使用邀请码注册的新用户，可获得 <strong>3次</strong> 额外额度。"
+
+[invite_rules_item_2]
+other = "<strong>邀请奖励</strong>：每成功邀请一位新用户注册，您将获得 <strong>5次</strong> 额外额度奖励。"
+
+[invite_rules_item_3]
+other = "<strong>额度扣减</strong>：邀请奖励在邀请成功后 <strong>1个月</strong> 内有效，系统会优先扣减每月的常规免费额度，消耗完毕后自动使用邀请奖励额度。"
+
+
 

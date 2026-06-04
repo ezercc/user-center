@@ -31,8 +31,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         subtitle: document.getElementById('auth-subtitle'),
         // 新密码输入框
         newPwd: document.getElementById('new-password'),
-        newPwdConfirm: document.getElementById('new-password-confirm')
+        newPwdConfirm: document.getElementById('new-password-confirm'),
+        regInviteCode: document.getElementById('reg-invite-code')
     };
+
+    // 解析 URL 中的邀请码 (aff)
+    const urlParams = new URLSearchParams(window.location.search);
+    const affCode = urlParams.get('aff');
+    if (affCode && elements.regInviteCode) {
+        elements.regInviteCode.value = affCode.trim();
+        elements.regInviteCode.parentElement.classList.add('filled');
+    }
+
+    // 支持直接从链接跳转至注册状态（极大提升新用户转化率）
+    const stepParam = urlParams.get('step');
+    if (stepParam === 'register' && !isRecoveryFlow) {
+        switchStep('register');
+    }
 
     // 获取重定向 URL
     function getRedirectUrl() {
@@ -197,9 +212,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const provider = e.currentTarget.getAttribute('data-provider');
             try {
                 const token = await executeCaptcha();
+                const oauthOptions = {
+                    captchaToken: token,
+                    redirectTo: getRedirectUrl()
+                };
+
+                // 如果 URL 中带有邀请码，封装到 options.data 中传递给第三方登录，绑定为新用户的推荐人
+                if (affCode) {
+                    oauthOptions.data = {
+                        referred_by: affCode.trim()
+                    };
+                }
+
                 await client.auth.signInWithOAuth({
                     provider: provider,
-                    options: { captchaToken: token, redirectTo: getRedirectUrl() }
+                    options: oauthOptions
                 });
             } catch (err) { if (err !== 'Captcha closed') Notifications.show(err.message, 'error'); }
         });
@@ -210,6 +237,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const email = elements.regEmail.value.trim();
         const pwd = document.getElementById('reg-password').value;
         const pwdR = document.getElementById('reg-password-repeat').value;
+        const inviteCode = elements.regInviteCode ? elements.regInviteCode.value.trim() : '';
 
         if (!email) return Notifications.show(window.i18n ? window.i18n.please_enter_email : '请输入电子邮箱', 'warning');
         if (!/^\S+@\S+\.\S+$/.test(email)) return Notifications.show(window.i18n ? window.i18n.invalid_email_format : '邮箱格式不正确', 'warning');
@@ -218,14 +246,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const token = await executeCaptcha();
-            const { error } = await client.auth.signUp({
+            const signUpData = {
                 email: email,
                 password: pwd,
                 options: {
                     captchaToken: token,
                     emailRedirectTo: getRedirectUrl()
                 }
-            });
+            };
+            if (inviteCode) {
+                signUpData.options.data = {
+                    referred_by: inviteCode
+                };
+            }
+            const { error } = await client.auth.signUp(signUpData);
             if (error) throw error;
             currentEmail = email;
             const successEmailEl = document.getElementById('register-success-email');

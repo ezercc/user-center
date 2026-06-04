@@ -176,10 +176,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const { data, error } = await client
-                .from('profiles')
-                .select('id, email')
-                .eq('email', email)
-                .single();
+                .rpc('search_profile_by_email', { email_query: email })
+                .maybeSingle();
 
             if (error || !data) {
                 Notifications.show('未找到该用户，请检查邮箱', 'warning');
