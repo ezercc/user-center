@@ -122,14 +122,14 @@ body {
 }
 
 /* 通知与验证码样式 */
-.notification { position: fixed; bottom: 16px; right: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); z-index: 2000; width: 300px; height: 48px; backdrop-filter: blur(10px); transform: translateX(calc(100% + 32px)); overflow: hidden; background: rgba(255,255,255,0.9); }
+.notification { position: fixed; bottom: 16px; right: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1), bottom 0.3s ease; z-index: 2000; width: 300px; min-height: 48px; backdrop-filter: blur(10px); transform: translateX(calc(100% + 32px)); overflow: hidden; background: rgba(255,255,255,0.9); }
 [data-theme="dark"] .notification { background: rgba(30,30,30,0.9); }
 .notification.show { transform: translateX(0); }
-.notification-wrapper { width: 100%; height: 100%; display: flex; align-items: center; }
-.notification-content { flex: 1; padding: 0 16px; z-index: 2; height: 100%; display: flex; align-items: center; }
-.notification-content p { margin: 0; padding: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #333; }
+.notification-wrapper { width: 100%; display: flex; align-items: stretch; }
+.notification-content { flex: 1; padding: 12px 16px; z-index: 2; display: flex; align-items: center; }
+.notification-content p { margin: 0; padding: 0; font-size: 14px; white-space: pre-wrap; word-break: break-word; color: #333; }
 [data-theme="dark"] .notification-content p { color: #eee; }
-.notification-icon { width: 48px; display: flex; align-items: center; justify-content: center; z-index: 1; height: 100%; }
+.notification-icon { width: 48px; display: flex; align-items: center; justify-content: center; z-index: 1; }
 .notification-icon .material-icons-round { font-size: 20px; color: white; }
 .notification.error .notification-icon { background: #ff4d4f; }
 .notification.error .notification-content p { color: #cf1322; }
