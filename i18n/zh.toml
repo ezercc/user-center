@@ -176,7 +176,10 @@ other = "设置密码"
 other = "确认密码"
 
 [password_hint]
-other = "*密码需不少于8位，且包含大小写字母和特殊字符"
+other = "*密码需不少于8位，且包含大小写字母、数字和特殊字符"
+
+[password_complexity_error]
+other = "密码需包含大小写字母、数字和特殊字符"
 
 [invitation_code_label]
 other = "邀请码 (选填)"

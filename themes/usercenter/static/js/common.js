@@ -141,6 +141,13 @@ const Notifications = {
     list: new Set(),
 
     show(message, type = 'info') {
+        if (message && typeof message === 'string') {
+            if (message.includes("Password should contain at least one character of each:")) {
+                message = (window.i18n && window.i18n.password_complexity_error) ||
+                          (window.userI18n && window.userI18n.password_complexity_error) ||
+                          "密码需包含大小写字母、数字和特殊字符";
+            }
+        }
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
 
@@ -174,10 +181,11 @@ const Notifications = {
 
     updatePosition() {
         const arr = Array.from(this.list);
+        let offset = 16;
         for (let i = arr.length - 1; i >= 0; i--) {
             const item = arr[i];
-            const offset = 16 + (arr.length - 1 - i) * 70;
             item.style.bottom = `${offset}px`;
+            offset += item.offsetHeight + 12;
         }
     }
 };

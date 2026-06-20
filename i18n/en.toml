@@ -176,7 +176,10 @@ other = "Set Password"
 other = "Confirm Password"
 
 [password_hint]
-other = "*Password must be at least 8 characters long, and include uppercase, lowercase, and special characters."
+other = "*Password must be at least 8 characters long, and include uppercase and lowercase letters, numbers, and special characters."
+
+[password_complexity_error]
+other = "Password must include uppercase and lowercase letters, numbers, and special characters"
 
 [invitation_code_label]
 other = "Invitation Code (Optional)"
