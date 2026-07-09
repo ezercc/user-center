@@ -268,6 +268,25 @@ window.UnreadBadge = UnreadBadge;
 // ----------------------------------------------------------------
 // 路由与重定向辅助 (i18n 兼容)
 // ----------------------------------------------------------------
+function isEzerCcHostname(hostname) {
+    if (!hostname) return false;
+    const host = hostname.toLowerCase();
+    return host === 'ezer.cc' || host.endsWith('.ezer.cc');
+}
+
+function isAllowedEzerCcRedirect(url) {
+    try {
+        const parsed = new URL(url);
+        if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+        return isEzerCcHostname(parsed.hostname);
+    } catch {
+        return false;
+    }
+}
+
+window.isEzerCcHostname = isEzerCcHostname;
+window.isAllowedEzerCcRedirect = isAllowedEzerCcRedirect;
+
 function getLoginUrl(redirectPath = '/') {
     const isEn = window.location.pathname.startsWith('/en/');
     const base = isEn ? '/en/login/' : '/login/';

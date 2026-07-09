@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 动态构建链接：指向产品落地页，并支持多语言
         const isEn = window.location.pathname.startsWith('/en/');
         const fullInviteLink = isEn 
-            ? `https://audit.ezer.cc/en/?aff=${inviteCode}`
-            : `https://audit.ezer.cc/?aff=${inviteCode}`;
+            ? `https://www.ezer.cc/en/?aff=${inviteCode}`
+            : `https://www.ezer.cc/?aff=${inviteCode}`;
 
         if (linkInput) {
             linkInput.value = fullInviteLink;

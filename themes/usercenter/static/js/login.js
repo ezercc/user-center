@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);
         const redirect = params.get('redirect');
         if (redirect) {
-            if (redirect.includes('ezer.cc')) return "https://account.ezer.cc/callback/?redirect=" + encodeURIComponent(redirect);
+            if (isAllowedEzerCcRedirect(redirect)) return "https://account.ezer.cc/callback/?redirect=" + encodeURIComponent(redirect);
             if (redirect.startsWith('/')) return "https://account.ezer.cc" + redirect;
         }
         return 'https://account.ezer.cc/';
