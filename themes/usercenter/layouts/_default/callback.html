@@ -19,7 +19,7 @@
             redirected = true;
             const params = new URLSearchParams(window.location.search);
             const redirect = params.get('redirect');
-            if (redirect && redirect.includes('ezer.cc')) {
+            if (redirect && isAllowedEzerCcRedirect(redirect)) {
                 window.location.href = redirect;
             } else {
                 window.location.href = "/";
