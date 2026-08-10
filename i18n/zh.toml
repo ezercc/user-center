@@ -1,3 +1,33 @@
+[current_plan]
+other = "当前计划"
+
+[free_plan]
+other = "免费版"
+
+[pro_plan]
+other = "专业版"
+
+[upgrade]
+other = "升级"
+
+[manage_subscription]
+other = "管理"
+
+[pro_valid_until]
+other = "专业版有效期至 {date}"
+
+[subscription_loading]
+other = "正在加载订阅信息..."
+
+[subscription_unavailable]
+other = "暂时无法加载订阅信息"
+
+[opening_subscription_portal]
+other = "正在打开订阅管理页面..."
+
+[subscription_portal_error]
+other = "无法打开订阅管理页面，请稍后重试"
+
 [account_settings]
 other = "账号设置"
 
@@ -358,5 +388,9 @@ other = "<strong>邀请奖励</strong>：每成功邀请一位新用户注册，
 [invite_rules_item_3]
 other = "<strong>额度扣减</strong>：邀请奖励在邀请成功后 <strong>1个月</strong> 内有效，系统会优先扣减每月的常规免费额度，消耗完毕后自动使用邀请奖励额度。"
 
+[valid_until]
+other = "有效期"
 
+[status]
+other = "状态"
 

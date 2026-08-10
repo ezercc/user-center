@@ -24,6 +24,31 @@
                         <label>{{ T "user_id" | default "用户 ID" }}</label>
                         <div class="info-value code-font" id="user-id">...</div>
                     </div>
+                    <div class="info-row" id="dashboard-account-plan"
+                        data-locale="{{ .Site.Language.Lang }}"
+                        data-free-plan="{{ T "free_plan" | default "免费版" }}"
+                        data-pro-plan="{{ T "pro_plan" | default "专业版" }}"
+                        data-upgrade="{{ T "upgrade" | default "升级" }}"
+                        data-manage="{{ T "manage_subscription" | default "管理" }}"
+                        data-loading="{{ T "subscription_loading" | default "正在加载订阅信息..." }}"
+                        data-unavailable="{{ T "subscription_unavailable" | default "暂时无法加载订阅信息" }}"
+                        data-opening-portal="{{ T "opening_subscription_portal" | default "正在打开订阅管理页面..." }}"
+                        data-portal-error="{{ T "subscription_portal_error" | default "无法打开订阅管理页面，请稍后重试" }}"
+                        data-pro-valid-until="{{ T "pro_valid_until" | default "专业版有效期至 {date}" }}">
+                        <label>{{ T "current_plan" | default "当前计划" }}</label>
+                        <div class="info-value" style="display: flex; align-items: center; gap: 8px;">
+                            <strong id="dashboard-plan-name" style="font-weight: 500;">{{ T "loading" | default "加载中..." }}</strong>
+                            <a class="dashboard-plan-action" id="dashboard-plan-action" hidden></a>
+                        </div>
+                    </div>
+                    <div class="info-row" id="dashboard-plan-expiry-row" hidden>
+                        <label>{{ T "valid_until" | default "有效期" }}</label>
+                        <div class="info-value" id="dashboard-plan-expiry">—</div>
+                    </div>
+                    <div class="info-row" id="dashboard-plan-status-row" hidden>
+                        <label>{{ T "status" | default "状态" }}</label>
+                        <div class="info-value" id="dashboard-plan-status">—</div>
+                    </div>
                 </div>
             </div>
 

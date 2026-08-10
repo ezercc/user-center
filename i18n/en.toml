@@ -1,3 +1,33 @@
+[current_plan]
+other = "Current plan"
+
+[free_plan]
+other = "Free"
+
+[pro_plan]
+other = "Pro"
+
+[upgrade]
+other = "Upgrade"
+
+[manage_subscription]
+other = "Manage"
+
+[pro_valid_until]
+other = "Pro valid until {date}"
+
+[subscription_loading]
+other = "Loading subscription..."
+
+[subscription_unavailable]
+other = "Subscription information is temporarily unavailable"
+
+[opening_subscription_portal]
+other = "Opening subscription management..."
+
+[subscription_portal_error]
+other = "Unable to open subscription management. Please try again later."
+
 [account_settings]
 other = "Account Settings"
 
@@ -358,5 +388,9 @@ other = "<strong>Inviter Reward</strong>: For every successful referral, you rec
 [invite_rules_item_3]
 other = "<strong>Deduction Order</strong>: Referral rewards are valid for <strong>1 month</strong> from the date of successful invitation. Standard monthly free quota is consumed first. Once exhausted, your referral rewards will be automatically used."
 
+[valid_until]
+other = "Valid until"
 
+[status]
+other = "Status"
 
