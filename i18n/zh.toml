@@ -20,7 +20,7 @@ other = "专业版有效期至 {date}"
 other = "正在加载订阅信息..."
 
 [subscription_unavailable]
-other = "暂时无法加载订阅信息"
+other = "加载失败"
 
 [opening_subscription_portal]
 other = "正在打开订阅管理页面..."
@@ -390,7 +390,4 @@ other = "<strong>额度扣减</strong>：邀请奖励在邀请成功后 <strong>
 
 [valid_until]
 other = "有效期"
-
-[status]
-other = "状态"
 

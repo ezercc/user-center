@@ -51,9 +51,7 @@ const AccountPlan = {
             planName: document.getElementById('dashboard-plan-name'),
             action: document.getElementById('dashboard-plan-action'),
             expiry: document.getElementById('dashboard-plan-expiry'),
-            expiryRow: document.getElementById('dashboard-plan-expiry-row'),
-            status: document.getElementById('dashboard-plan-status'),
-            statusRow: document.getElementById('dashboard-plan-status-row')
+            expiryRow: document.getElementById('dashboard-plan-expiry-row')
         };
     },
 
@@ -67,7 +65,6 @@ const AccountPlan = {
     showFree(elements) {
         elements.planName.textContent = elements.root.dataset.freePlan;
         if (elements.expiryRow) elements.expiryRow.hidden = true;
-        if (elements.statusRow) elements.statusRow.hidden = true;
         this.setAction(elements, elements.root.dataset.upgrade, null);
         const locale = elements.root.dataset.locale === 'en' ? 'en' : 'zh';
         elements.action.href = locale === 'en'
@@ -76,13 +73,9 @@ const AccountPlan = {
     },
 
     showUnavailable(elements) {
-        elements.planName.textContent = '—';
+        elements.planName.textContent = elements.root.dataset.unavailable;
         elements.action.hidden = true;
         if (elements.expiryRow) elements.expiryRow.hidden = true;
-        if (elements.statusRow) {
-            elements.statusRow.hidden = false;
-            elements.status.textContent = elements.root.dataset.unavailable;
-        }
     },
 
     showPremium(elements, session, paidThrough) {
@@ -98,7 +91,6 @@ const AccountPlan = {
             elements.expiryRow.hidden = false;
             elements.expiry.textContent = formattedDate;
         }
-        if (elements.statusRow) elements.statusRow.hidden = true;
         this.setAction(elements, elements.root.dataset.manage, () => this.openPortal(elements, session));
     },
 

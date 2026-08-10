@@ -20,7 +20,7 @@ other = "Pro valid until {date}"
 other = "Loading subscription..."
 
 [subscription_unavailable]
-other = "Subscription information is temporarily unavailable"
+other = "Failed to load"
 
 [opening_subscription_portal]
 other = "Opening subscription management..."
@@ -390,7 +390,4 @@ other = "<strong>Deduction Order</strong>: Referral rewards are valid for <stron
 
 [valid_until]
 other = "Valid until"
-
-[status]
-other = "Status"
 
