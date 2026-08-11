@@ -7,67 +7,8 @@
         <h1 class="page-title">{{ T "invite_friends" }}</h1>
 
         <div class="settings-grid">
-            <!-- 左侧列：上下两个卡片 -->
+            <!-- 左侧列：最上面是推广收益，下面是邀请码容器 -->
             <div class="invite-left-col">
-                <!-- 上方卡片：专属邀请码与链接复制 -->
-                <div class="card invite-code-card">
-                    <div class="card-header">
-                        <h3><span class="material-icons-round">card_giftcard</span> {{ T "your_invite_code" }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="code-box-wrapper-compact">
-                            <div class="invite-code-display" id="invite-code-display">--------</div>
-                            <div class="pulse-ring"></div>
-                        </div>
-                        <p class="text-secondary hint-text">{{ T "invite_friends_hint" }}</p>
-                        
-                        <!-- 邀请规则板块 -->
-                        <div class="invite-rules-box">
-                            <div class="rules-title">
-                                <span class="material-icons-round rules-title-icon">info</span>
-                                {{ T "invite_rules_title" }}
-                            </div>
-                            <ul class="rules-list">
-                                <li>{{ T "invite_rules_item_1" | safeHTML }}</li>
-                                <li>{{ T "invite_rules_item_2" | safeHTML }}</li>
-                                <li>{{ T "invite_rules_item_3" | safeHTML }}</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="link-copy-container">
-                            <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
-                            <button class="btn-primary" id="btn-copy-link">
-                                <span class="material-icons-round btn-icon">content_copy</span>
-                                <span class="btn-text-full">{{ T "copy_invite_link" }}</span>
-                                <span class="btn-text-short">{{ T "copy" }}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 下方卡片：使用次数统计 -->
-                <div class="card quota-stats-card">
-                    <div class="card-header">
-                        <h3><span class="material-icons-round">analytics</span> {{ T "quota_statistics" }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="stats-grid">
-                            <div class="stat-box">
-                                <div class="stat-value" id="remaining-quota-display">-</div>
-                                <div class="stat-label">{{ T "remaining_uses" }}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-value" id="accumulated-quota-display">-</div>
-                                <div class="stat-label">{{ T "accumulated_uses" }}</div>
-                            </div>
-                        </div>
-                        <div class="expiration-banner" id="expiration-banner" style="display: none;">
-                            <span class="material-icons-round info-icon">error_outline</span>
-                            <span class="expire-text" id="expiration-quota-text">-</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 下方卡片2：推广收益钱包 -->
                 <div class="card rebate-stats-card">
                     <div class="card-header">
@@ -112,7 +53,7 @@
                                 </div>
                             </div>
                             <div class="withdrawal-action-container">
-                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfD_YOUR_GOOGLE_FORM_ID/viewform" 
+                                <a href="{{ .Site.Params.withdrawalFormUrl }}" 
                                    id="btn-request-withdrawal" 
                                    target="_blank">
                                     <span class="material-icons-round btn-icon">payment</span>
@@ -122,19 +63,81 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 上方卡片：专属邀请码与链接复制 -->
+                <div class="card invite-code-card">
+                    <div class="card-header">
+                        <h3><span class="material-icons-round">card_giftcard</span> {{ T "your_invite_code" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="code-box-wrapper-compact">
+                            <div class="invite-code-display" id="invite-code-display">--------</div>
+                            <div class="pulse-ring"></div>
+                        </div>
+                        <p class="text-secondary hint-text">{{ T "invite_friends_hint" }}</p>
+                        
+                        <!-- 邀请规则板块 -->
+                        <div class="invite-rules-box">
+                            <div class="rules-title">
+                                <span class="material-icons-round rules-title-icon">info</span>
+                                {{ T "invite_rules_title" }}
+                            </div>
+                            <ul class="rules-list">
+                                <li>{{ T "invite_rules_item_1" | safeHTML }}</li>
+                                <li>{{ T "invite_rules_item_2" | safeHTML }}</li>
+                                <li>{{ T "invite_rules_item_3" | safeHTML }}</li>
+                                <li id="rules-rebate-item">{{ T "invite_rules_item_4" | safeHTML }}</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="link-copy-container">
+                            <input type="text" id="invite-link-input" readonly value="{{ T "loading_invite_link" }}">
+                            <button class="btn-primary" id="btn-copy-link">
+                                <span class="material-icons-round btn-icon">content_copy</span>
+                                <span class="btn-text-full">{{ T "copy_invite_link" }}</span>
+                                <span class="btn-text-short">{{ T "copy" }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-
-            <!-- 右侧卡片：已成功邀请的好友列表 -->
-            <div class="card referred-list-card">
-                <div class="card-header">
-                    <h3><span class="material-icons-round">people</span> {{ T "invited_users_list" }}</h3>
+            <!-- 右侧列：最上面是获得额度，下面是注册记录 -->
+            <div class="invite-right-col">
+                <!-- 下方卡片：使用次数统计 -->
+                <div class="card quota-stats-card">
+                    <div class="card-header">
+                        <h3><span class="material-icons-round">analytics</span> {{ T "quota_statistics" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-value" id="remaining-quota-display">-</div>
+                                <div class="stat-label">{{ T "remaining_uses" }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="accumulated-quota-display">-</div>
+                                <div class="stat-label">{{ T "accumulated_uses" }}</div>
+                            </div>
+                        </div>
+                        <div class="expiration-banner" id="expiration-banner" style="display: none;">
+                            <span class="material-icons-round info-icon">error_outline</span>
+                            <span class="expire-text" id="expiration-quota-text">-</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body" style="padding: 0;">
-                    <div id="referred-users-container" class="table-responsive">
-                        <div style="padding: 40px; text-align: center; color: var(--text-secondary);" id="referred-users-loading">
-                            <div class="spinner" style="margin: 0 auto 12px auto;"></div>
-                            <p>{{ T "loading" }}</p>
+
+                <!-- 右侧卡片：已成功邀请的好友列表 -->
+                <div class="card referred-list-card">
+                    <div class="card-header">
+                        <h3><span class="material-icons-round">people</span> {{ T "invited_users_list" }}</h3>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div id="referred-users-container" class="table-responsive">
+                            <div style="padding: 40px; text-align: center; color: var(--text-secondary);" id="referred-users-loading">
+                                <div class="spinner" style="margin: 0 auto 12px auto;"></div>
+                                <p>{{ T "loading" }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +148,7 @@
 
 <style>
     /* 邀请码与额度统计专属高级布局 */
-    .invite-left-col {
+    .invite-left-col, .invite-right-col {
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -496,7 +499,6 @@
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        margin-top: 4px;
     }
     .rebate-container {
         display: flex;
@@ -504,23 +506,14 @@
         gap: 16px;
     }
     .rebate-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-    @media (max-width: 600px) {
-        .rebate-grid {
-            grid-template-columns: 1fr;
-        }
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
     }
     .rebate-item-box {
-        padding: 16px;
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-    }
-    [data-theme="dark"] .rebate-item-box {
-        background: rgba(255, 255, 255, 0.02);
+        padding: 0;
+        background: transparent;
+        border: none;
     }
     .rebate-currency-title {
         font-size: 12px;

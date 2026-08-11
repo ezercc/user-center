@@ -388,6 +388,9 @@ other = "<strong>Inviter Reward</strong>: For every successful referral, you rec
 [invite_rules_item_3]
 other = "<strong>Deduction Order</strong>: Referral rewards are valid for <strong>1 month</strong> from the date of successful invitation. Standard monthly free quota is consumed first. Once exhausted, your referral rewards will be automatically used."
 
+[invite_rules_item_4]
+other = "<strong>Subscription Rebate</strong>: If your referred friend subscribes to a paid plan, you will receive a <strong id=\"rules-rebate-percentage\">--</strong> cash rebate of their payment amount (multi-currency support, withdrawable)."
+
 [valid_until]
 other = "Valid until"
 

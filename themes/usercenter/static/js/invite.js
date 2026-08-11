@@ -27,10 +27,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 初始化核心逻辑
     async function initInvitePage() {
         console.log('[Invite] Fetching profile from database for ID:', user.id);
-        // A. 从 profiles 表获取当前用户的邀请码
+        // A. 从 profiles 表获取当前用户的邀请码和自定义返利比率
         let { data: profile, error: profileError } = await client
             .from('profiles')
-            .select('invitation_code')
+            .select('invitation_code, custom_affiliate_rate')
             .eq('id', user.id)
             .maybeSingle();
 
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             inviteCode = profile.invitation_code;
         }
 
-        // B. 渲染邀请码与邀请链接
+        // B. 渲染邀请码与邀请链接，并根据具体用户的返利比率更新规则说明
         const codeDisplay = document.getElementById('invite-code-display');
         const linkInput = document.getElementById('invite-link-input');
 
@@ -78,6 +78,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (linkInput) {
             linkInput.value = fullInviteLink;
+        }
+
+        const rebateRate = profile && profile.custom_affiliate_rate != null 
+            ? profile.custom_affiliate_rate 
+            : 0.15;
+        const ratePercent = Math.round(rebateRate * 100) + '%';
+        const rebatePercentEl = document.getElementById('rules-rebate-percentage');
+        if (rebatePercentEl) {
+            rebatePercentEl.textContent = ratePercent;
         }
 
         // C. 设置复制按钮监听

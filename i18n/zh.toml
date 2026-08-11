@@ -388,6 +388,9 @@ other = "<strong>邀请奖励</strong>：每成功邀请一位新用户注册，
 [invite_rules_item_3]
 other = "<strong>额度扣减</strong>：邀请奖励在邀请成功后 <strong>1个月</strong> 内有效，系统会优先扣减每月的常规免费额度，消耗完毕后自动使用邀请奖励额度。"
 
+[invite_rules_item_4]
+other = "<strong>订阅返利</strong>：受邀好友在注册后进行付费订阅，您将获得其订阅支付金额的 <strong id=\"rules-rebate-percentage\">--</strong> 现金返利（多币种支持，可提现）。"
+
 [valid_until]
 other = "有效期"
 
