@@ -383,11 +383,27 @@ other = "Referral Rules"
 other = "<strong>New User Benefit</strong>: New users registered with an invite code receive <strong>3 extra</strong> uses."
 
 [invite_rules_item_2]
-other = "<strong>Inviter Reward</strong>: For every successful referral, you receive <strong>5 extra</strong> uses as a reward."
+other = "<strong>Inviter Reward</strong>: For every successful referral, you receive <strong>3 extra</strong> uses as a reward."
 
 [invite_rules_item_3]
 other = "<strong>Deduction Order</strong>: Referral rewards are valid for <strong>1 month</strong> from the date of successful invitation. Standard monthly free quota is consumed first. Once exhausted, your referral rewards will be automatically used."
 
 [valid_until]
 other = "Valid until"
+
+[rebate_statistics]
+other = "Promotional Earnings"
+
+[available_balance]
+other = "Available Balance"
+
+[total_earned]
+other = "Total Earned"
+
+[total_withdrawn]
+other = "Total Withdrawn"
+
+[request_withdrawal]
+other = "Request Withdrawal"
+
 

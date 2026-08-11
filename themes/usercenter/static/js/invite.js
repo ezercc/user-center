@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const { data, error: invError } = await client
                     .from('invitations')
-                    .select('remaining_uses, accumulated_uses, expiration_dates')
+                    .select('remaining_uses, accumulated_uses, expiration_dates, cash_balance_cny, cash_total_earned_cny, cash_balance_usd, cash_total_earned_usd')
                     .eq('user_id', user.id)
                     .maybeSingle();
                 
@@ -319,8 +319,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .map(d => new Date(d))
                 .filter(d => d > now);
 
-            // 本地校正后的邀请人可用额度上限 = 有效未过期数量 * 5
-            const localMaxInviterQuota = validInviterDates.length * 5;
+            // 本地校正后的邀请人可用额度上限 = 有效未过期数量 * 3
+            const localMaxInviterQuota = validInviterDates.length * 3;
             const correctedInviterRemaining = Math.min(inviterRemaining, localMaxInviterQuota);
 
             // D. 汇总结果
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             sortedInviterDates.forEach(date => {
                 if (tempRemaining > 0) {
-                    const amount = Math.min(5, tempRemaining);
+                    const amount = Math.min(3, tempRemaining);
                     expirationList.push({ date, amount });
                     tempRemaining -= amount;
                 }
@@ -374,12 +374,54 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (expireEl) expireEl.textContent = window.inviteI18n ? window.inviteI18n.no_expiring_quota : '暂无即将过期的额度';
                 if (expireBanner) expireBanner.style.display = 'none';
             }
+            
+            // 渲染推广收益钱包
+            renderRebateWallet(invRecord);
         } catch (err) {
             console.error('[Invite] Failed to process quota stats:', err);
             if (remainingEl) remainingEl.textContent = '-';
             if (accumulatedEl) accumulatedEl.textContent = '-';
             if (expireEl) expireEl.textContent = '加载出错';
             if (expireBanner) expireBanner.style.display = 'none';
+            renderRebateWallet(null);
+        }
+    }
+
+    // 渲染返利钱包的具体数据及处理计算
+    function renderRebateWallet(invRecord) {
+        const balanceCnyEl = document.getElementById('rebate-balance-cny');
+        const earnedCnyEl = document.getElementById('rebate-earned-cny');
+        const withdrawnCnyEl = document.getElementById('rebate-withdrawn-cny');
+        
+        const balanceUsdEl = document.getElementById('rebate-balance-usd');
+        const earnedUsdEl = document.getElementById('rebate-earned-usd');
+        const withdrawnUsdEl = document.getElementById('rebate-withdrawn-usd');
+
+        const btnWithdraw = document.getElementById('btn-request-withdrawal');
+
+        const balanceCny = invRecord ? (invRecord.cash_balance_cny || 0) : 0;
+        const earnedCny = invRecord ? (invRecord.cash_total_earned_cny || 0) : 0;
+        const withdrawnCny = Math.max(0, earnedCny - balanceCny);
+
+        const balanceUsd = invRecord ? (invRecord.cash_balance_usd || 0) : 0;
+        const earnedUsd = invRecord ? (invRecord.cash_total_earned_usd || 0) : 0;
+        const withdrawnUsd = Math.max(0, earnedUsd - balanceUsd);
+
+        if (balanceCnyEl) balanceCnyEl.textContent = (balanceCny / 100).toFixed(2);
+        if (earnedCnyEl) earnedCnyEl.textContent = (earnedCny / 100).toFixed(2);
+        if (withdrawnCnyEl) withdrawnCnyEl.textContent = (withdrawnCny / 100).toFixed(2);
+
+        if (balanceUsdEl) balanceUsdEl.textContent = (balanceUsd / 100).toFixed(2);
+        if (earnedUsdEl) earnedUsdEl.textContent = (earnedUsd / 100).toFixed(2);
+        if (withdrawnUsdEl) withdrawnUsdEl.textContent = (withdrawnUsd / 100).toFixed(2);
+
+        // 动态将推广员的 user_id 和 email 预填到提现申请表单中
+        if (btnWithdraw && user && user.id) {
+            const baseFormUrl = btnWithdraw.getAttribute('href');
+            if (baseFormUrl && !baseFormUrl.includes('entry.')) {
+                // entry.1000001 和 entry.2000002 作为预设表单参数占位符，可由用户自行修改
+                btnWithdraw.href = `${baseFormUrl}?entry.1000001=${encodeURIComponent(user.id)}&entry.2000002=${encodeURIComponent(user.email || '')}`;
+            }
         }
     }
 });

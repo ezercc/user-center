@@ -67,7 +67,63 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 下方卡片2：推广收益钱包 -->
+                <div class="card rebate-stats-card">
+                    <div class="card-header">
+                        <h3><span class="material-icons-round">account_balance_wallet</span> {{ T "rebate_statistics" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="rebate-container">
+                            <div class="rebate-grid">
+                                <div class="rebate-item-box">
+                                    <div class="rebate-currency-title">CNY (人民币)</div>
+                                    <div class="rebate-stats-row">
+                                        <div class="rebate-stat">
+                                            <div class="val-wrapper"><span class="currency-symbol">¥</span><span class="val" id="rebate-balance-cny">-</span></div>
+                                            <span class="lbl">{{ T "available_balance" }}</span>
+                                        </div>
+                                        <div class="rebate-stat">
+                                            <div class="val-wrapper"><span class="currency-symbol">¥</span><span class="val" id="rebate-earned-cny">-</span></div>
+                                            <span class="lbl">{{ T "total_earned" }}</span>
+                                        </div>
+                                        <div class="rebate-stat">
+                                            <div class="val-wrapper"><span class="currency-symbol">¥</span><span class="val" id="rebate-withdrawn-cny">-</span></div>
+                                            <span class="lbl">{{ T "total_withdrawn" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rebate-item-box">
+                                    <div class="rebate-currency-title">USD (美元)</div>
+                                    <div class="rebate-stats-row">
+                                        <div class="rebate-stat">
+                                            <div class="val-wrapper"><span class="currency-symbol">$</span><span class="val" id="rebate-balance-usd">-</span></div>
+                                            <span class="lbl">{{ T "available_balance" }}</span>
+                                        </div>
+                                        <div class="rebate-stat">
+                                            <div class="val-wrapper"><span class="currency-symbol">$</span><span class="val" id="rebate-earned-usd">-</span></div>
+                                            <span class="lbl">{{ T "total_earned" }}</span>
+                                        </div>
+                                        <div class="rebate-stat">
+                                            <div class="val-wrapper"><span class="currency-symbol">$</span><span class="val" id="rebate-withdrawn-usd">-</span></div>
+                                            <span class="lbl">{{ T "total_withdrawn" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="withdrawal-action-container">
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfD_YOUR_GOOGLE_FORM_ID/viewform" 
+                                   id="btn-request-withdrawal" 
+                                   target="_blank">
+                                    <span class="material-icons-round btn-icon">payment</span>
+                                    <span>{{ T "request_withdrawal" }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
 
             <!-- 右侧卡片：已成功邀请的好友列表 -->
             <div class="card referred-list-card">
@@ -433,6 +489,108 @@
         .settings-grid {
             grid-template-columns: 1fr;
         }
+    }
+
+    /* 推广收益钱包专属样式 */
+    .rebate-stats-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 4px;
+    }
+    .rebate-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .rebate-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    @media (max-width: 600px) {
+        .rebate-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .rebate-item-box {
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    [data-theme="dark"] .rebate-item-box {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .rebate-currency-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+    }
+    .rebate-stats-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .rebate-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+    .val-wrapper {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+    }
+    .currency-symbol {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+    .rebate-stat .val {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-color);
+        font-family: 'Outfit', 'Inter', sans-serif;
+    }
+    .rebate-stat .lbl {
+        font-size: 11px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+    .withdrawal-action-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+    #btn-request-withdrawal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: auto;
+        min-width: 140px;
+        height: 38px;
+        padding: 0 16px;
+        font-size: 13px;
+        text-decoration: none;
+        border-radius: 8px;
+        background: var(--primary-color);
+        color: white;
+        font-weight: 500;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        cursor: pointer;
+    }
+    #btn-request-withdrawal:hover {
+        background: var(--primary-hover, #1557b0);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
     }
 </style>
 
