@@ -212,8 +212,8 @@
             intercept_redirect_log: '{{ T "intercept_redirect_log" }}'
         };
     </script>
-    <script src="{{ absURL "js/common.js"}}"></script>
-    <script src="{{ absURL "js/login.js"}}"></script>
+    <script src="{{ "js/common.js" | relURL }}?v=5"></script>
+    <script src="{{ "js/login.js" | relURL }}?v=5"></script>
 </body>
 
 </html>

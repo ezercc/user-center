@@ -52,13 +52,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="pending-withdrawal-banner" id="withdrawal-pending-banner" style="display: none;">
+                                <span class="material-icons-round info-icon">info</span>
+                                <span id="withdrawal-pending-text">您有提现申请正在等待处理，暂不能提交新的提现申请</span>
+                            </div>
                             <div class="withdrawal-action-container">
-                                <a href="{{ .Site.Params.withdrawalFormUrl }}" 
-                                   id="btn-request-withdrawal" 
-                                   target="_blank">
+                                <button type="button" id="btn-request-withdrawal">
                                     <span class="material-icons-round btn-icon">payment</span>
                                     <span>{{ T "request_withdrawal" }}</span>
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -174,6 +176,16 @@
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .referred-list-card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
     .invite-code-card .card-body, .quota-stats-card .card-body {
@@ -413,7 +425,8 @@
     /* 表格与列表高级样式 */
     .table-responsive {
         width: 100%;
-        height: 405px;
+        flex: 1;
+        min-height: 0;
         overflow-x: auto;
         overflow-y: auto;
     }
@@ -585,9 +598,367 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
     }
+
+    /* 提现模态框专属样式 */
+    #withdrawal-modal.modal-overlay {
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.5) !important;
+    }
+    @media (max-height: 700px) {
+        #withdrawal-modal.modal-overlay {
+            align-items: flex-start;
+            overflow-y: auto;
+        }
+    }
+    .withdrawal-modal-card {
+        max-width: 500px !important;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 24px 32px;
+        text-align: left;
+        position: relative;
+    }
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: color 0.2s;
+    }
+    .modal-close:hover {
+        color: var(--text-color);
+    }
+    .modal-header-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .modal-header-icon {
+        font-size: 32px;
+        color: var(--primary-color);
+    }
+    .modal-header-section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-color);
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="number"] {
+        width: 100%;
+        height: 42px;
+        padding: 0 16px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg, transparent);
+        color: var(--text-color);
+        outline: none;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+    .form-group input[type="text"]:focus,
+    .form-group input[type="number"]:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+    .amount-input-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--input-bg, transparent);
+        height: 42px;
+        box-sizing: border-box;
+        overflow: hidden;
+        transition: all 0.2s;
+        position: relative;
+    }
+    .amount-input-wrapper:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+    .currency-select-inline {
+        background: transparent !important;
+        border: none !important;
+        border-right: 1px solid var(--border-color) !important;
+        border-radius: 8px 0 0 8px !important;
+        height: 100% !important;
+        width: 80px !important;
+        padding: 0 24px 0 12px !important;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-color);
+        outline: none;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: none !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 8px center !important;
+        background-size: 14px !important;
+        color-scheme: light dark;
+    }
+    .currency-select-inline option {
+        background: var(--card-bg, #202124);
+        color: var(--text-color, #fff);
+    }
+    .amount-input-wrapper input {
+        border: none !important;
+        height: 100% !important;
+        flex: 1;
+        padding-left: 12px !important;
+        padding-right: 64px !important;
+        box-shadow: none !important;
+    }
+    .form-group select:not(.currency-select-inline) {
+        width: 100%;
+        height: 42px;
+        padding: 0 36px 0 16px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg, transparent);
+        color: var(--text-color);
+        outline: none;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        font-family: inherit;
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 14px;
+        color-scheme: light dark;
+    }
+    .form-group select:not(.currency-select-inline) option {
+        background: var(--card-bg, #202124);
+        color: var(--text-color, #fff);
+    }
+    .form-group select:not(.currency-select-inline):focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+    .btn-text-only {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 8px;
+    }
+    .btn-text-only:hover {
+        opacity: 0.8;
+    }
+    .amount-hint {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 6px;
+    }
+    .info-alert {
+        display: flex;
+        gap: 10px;
+        background: var(--alert-bg, rgba(26, 115, 232, 0.08));
+        border: 1px dashed var(--primary-color);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+    .info-alert-icon {
+        color: var(--primary-color);
+        font-size: 20px;
+    }
+    .info-alert-text {
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-color);
+    }
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 28px;
+    }
+    .btn-secondary {
+        height: 38px;
+        padding: 0 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+        background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+    }
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .pending-withdrawal-banner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 152, 0, 0.06);
+        border: 1px solid rgba(255, 152, 0, 0.15);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #d84315;
+        font-size: 13px;
+        margin-bottom: 12px;
+        margin-top: 12px;
+    }
+    [data-theme="dark"] .pending-withdrawal-banner {
+        background: rgba(255, 152, 0, 0.1);
+        border-color: rgba(255, 152, 0, 0.25);
+        color: #ffb74d;
+    }
+    .pending-withdrawal-banner .info-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
 </style>
 
-<script src="{{ absURL "js/common.js"}}"></script>
+<!-- 提现申请模态框 -->
+<div id="withdrawal-modal" class="modal-overlay">
+    <div class="modal-card withdrawal-modal-card">
+        <div class="modal-close" id="btn-close-withdrawal-modal">
+            <span class="material-icons-round">close</span>
+        </div>
+        <div class="modal-header-section">
+            <span class="material-icons-round modal-header-icon">payments</span>
+            <h2>{{ T "request_withdrawal" }}</h2>
+        </div>
+        
+        <form id="withdrawal-form">
+            <!-- 提现金额（包含左侧币种下拉菜单） -->
+            <div class="form-group">
+                <label class="form-label" for="withdrawal-amount">{{ T "withdrawal_amount" }}</label>
+                <div class="amount-input-wrapper">
+                    <select id="withdrawal-currency-select" class="currency-select-inline" name="currency">
+                        {{ if eq .Site.Language.Lang "zh" }}
+                        <option value="CNY" selected>CNY</option>
+                        <option value="USD">USD</option>
+                        {{ else }}
+                        <option value="USD" selected>USD</option>
+                        <option value="CNY">CNY</option>
+                        {{ end }}
+                    </select>
+                    <input type="number" id="withdrawal-amount" step="0.01" min="0.01" placeholder="0.00" required>
+                    <button type="button" id="btn-amount-all" class="btn-text-only">{{ T "all_balance" }}</button>
+                </div>
+                <div class="amount-hint" id="amount-hint-text">{{ T "available_balance" }}: ¥0.00</div>
+            </div>
+
+            <!-- 提现方式（下拉菜单） -->
+            <div class="form-group">
+                <label class="form-label" for="withdrawal-method-select">{{ T "withdrawal_method" }}</label>
+                <select id="withdrawal-method-select" name="payment_method" required>
+                    <option value="bank">{{ T "bank_transfer" }} ({{ T "bank_transfer_desc" }})</option>
+                    <option value="agreed">{{ T "agreed_method" }}</option>
+                </select>
+            </div>
+
+            <!-- 银行属地（仅在选择银行转账时显示） -->
+            {{ if eq .Site.Language.Lang "zh" }}
+            <div class="form-group" id="bank-region-group">
+                <label class="form-label" for="withdrawal-bank-region">{{ T "bank_region" | default "银行属地" }}</label>
+                <select id="withdrawal-bank-region" name="bank_region" required>
+                    <option value="mainland" selected>{{ T "china_mainland" | default "中国大陆" }}</option>
+                    <option value="non_mainland">{{ T "non_mainland" | default "非中国大陆地区" }}</option>
+                </select>
+            </div>
+            {{ else }}
+            <div class="form-group" id="bank-region-group">
+                <label class="form-label" for="withdrawal-bank-region">{{ T "bank_region" | default "银行属地" }}</label>
+                <select id="withdrawal-bank-region" name="bank_region" required disabled style="opacity: 0.7; cursor: not-allowed;">
+                    <option value="non_mainland" selected>{{ T "non_mainland" | default "非中国大陆地区" }}</option>
+                </select>
+            </div>
+            {{ end }}
+
+            <!-- 真实姓名 -->
+            <div class="form-group">
+                <label class="form-label" for="withdrawal-real-name">{{ T "real_name" }}</label>
+                <input type="text" id="withdrawal-real-name" placeholder="{{ T "real_name_placeholder" }}" required>
+            </div>
+
+            <!-- 银行卡信息（银行汇款时显示） -->
+            <div id="bank-fields-container">
+                <!-- 大陆银行字段 -->
+                <div id="bank-mainland-fields">
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawal-bank-name">{{ T "bank_name" }}</label>
+                        <input type="text" id="withdrawal-bank-name" placeholder="{{ T "bank_name_placeholder" | default "请输入开户银行及具体支行，如：招商银行深圳科苑支行" }}" required>
+                    </div>
+                </div>
+                <!-- 非大陆银行字段 -->
+                <div id="bank-non-mainland-fields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawal-bank-name-en">{{ T "bank_name_en" | default "银行英文名称" }}</label>
+                        <input type="text" id="withdrawal-bank-name-en" placeholder="{{ T "bank_name_en_placeholder" | default "e.g. Citibank, N.A." }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawal-bank-swift">{{ T "swift_code" | default "SWIFT Code" }}</label>
+                        <input type="text" id="withdrawal-bank-swift" placeholder="{{ T "swift_code_placeholder" | default "e.g. CITIUS33XXX" }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="withdrawal-bank-country">{{ T "bank_country" | default "银行国家/地区" }}</label>
+                        <input type="text" id="withdrawal-bank-country" placeholder="{{ T "bank_country_placeholder" | default "e.g. United States" }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡号/收款账号（共同字段，通过JS动态切换标签与Placeholder） -->
+            <div class="form-group">
+                <label class="form-label" for="withdrawal-card-number" id="label-card-number">{{ T "card_number" }}</label>
+                <input type="text" id="withdrawal-card-number" placeholder="{{ T "card_number_placeholder" }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="withdrawal-card-number-confirm" id="label-card-number-confirm">{{ T "confirm_card_number" }}</label>
+                <input type="text" id="withdrawal-card-number-confirm" placeholder="{{ T "confirm_card_number_placeholder" }}" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" id="btn-cancel-withdrawal">{{ T "cancel" }}</button>
+                <button type="submit" class="btn-primary" id="btn-submit-withdrawal">{{ T "submit_application" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{{ "js/common.js" | relURL }}?v=5"></script>
 <script type="text/javascript">
     window.inviteI18n = {
         copied: '{{ T "copied" | default "已复制" }}',
@@ -602,9 +973,35 @@
         remaining_uses: '{{ T "remaining_uses" | default "当前剩余使用次数" }}',
         accumulated_uses: '{{ T "accumulated_uses" | default "累计获得次数" }}',
         no_expiring_quota: '{{ T "no_expiring_quota" | default "暂无即将过期的额度" }}',
-        uses_expire_format: '{{ T "uses_expire_format" | default "{uses}次将于{days}天后过期" }}'
+        uses_expire_format: '{{ T "uses_expire_format" | default "{uses}次将于{days}天后过期" }}',
+        amount_required: '{{ T "amount_required" | default "请填写有效的提现金额" }}',
+        amount_exceed: '{{ T "amount_exceed" | default "提现金额已超过可提现余额" }}',
+        name_required: '{{ T "name_required" | default "请填写真实姓名" }}',
+        bank_required: '{{ T "bank_required" | default "请填写开户银行" }}',
+        card_required: '{{ T "card_required" | default "请填写银行卡号" }}',
+        card_mismatch: '{{ T "card_mismatch" | default "两次输入的银行卡号不一致，请重新输入" }}',
+        withdrawal_success: '{{ T "withdrawal_success" | default "提现申请已成功提交，我们将尽快为您处理！" }}',
+        withdrawal_failed: '{{ T "withdrawal_failed" | default "提交提现申请失败，请稍后重试：" }}',
+        amount_min_cny: '{{ T "amount_min_cny" | default "人民币最低提现金额为100元" }}',
+        amount_min_usd: '{{ T "amount_min_usd" | default "美元最低提现金额为20美金" }}',
+        card_number_agreed: '{{ T "card_number_agreed" | default "收款账号" }}',
+        card_number_agreed_placeholder: '{{ T "card_number_agreed_placeholder" | default "请输入收款账号（如支付宝/微信/其他约定账号）" }}',
+        confirm_card_number_agreed: '{{ T "confirm_card_number_agreed" | default "确认收款账号" }}',
+        confirm_card_number_agreed_placeholder: '{{ T "confirm_card_number_agreed_placeholder" | default "请再次输入收款账号以核对" }}',
+        card_required_agreed: '{{ T "card_required_agreed" | default "请填写收款账号" }}',
+        card_mismatch_agreed: '{{ T "card_mismatch_agreed" | default "两次输入的收款账号不一致，请重新输入" }}',
+        card_number_non_mainland: '{{ T "card_number_non_mainland" | default "银行账号/IBAN (Account Number/IBAN)" }}',
+        card_number_non_mainland_placeholder: '{{ T "card_number_non_mainland_placeholder" | default "请输入银行账号或IBAN" }}',
+        confirm_card_number_non_mainland: '{{ T "confirm_card_number_non_mainland" | default "确认账号/IBAN" }}',
+        confirm_card_number_non_mainland_placeholder: '{{ T "confirm_card_number_non_mainland_placeholder" | default "请再次输入银行账号或IBAN以核对" }}',
+        bank_name_en_required: '{{ T "bank_name_en_required" | default "请填写银行英文名称" }}',
+        swift_required: '{{ T "swift_required" | default "请填写 SWIFT Code" }}',
+        country_required: '{{ T "country_required" | default "请填写银行国家/地区" }}',
+        withdrawal_balance_hint: '{{ T "withdrawal_balance_hint" | default "可提现余额: {symbol}{balance} (最低提现: {symbol}{min})" }}',
+        withdrawal_pending_hint: '{{ T "withdrawal_pending_hint" | default "您有 {amount} 提现正在等待处理，暂不能提交新的提现申请" }}',
+        withdrawal_pending_limit_error: '{{ T "withdrawal_pending_limit_error" | default "您已有正在处理中的提现申请，需处理完毕后才能提交新的申请" }}'
     };
 </script>
-<script src="{{ absURL "js/invite.js"}}"></script>
+<script src="{{ "js/invite.js" | relURL }}?v=5"></script>
 </body>
 </html>
