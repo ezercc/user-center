@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 动态构建链接：指向产品落地页，并支持多语言
         const isEn = window.location.pathname.startsWith('/en/');
-        const fullInviteLink = isEn 
+        const fullInviteLink = isEn
             ? `https://www.ezer.cc/en/?aff=${inviteCode}`
             : `https://www.ezer.cc/?aff=${inviteCode}`;
 
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             linkInput.value = fullInviteLink;
         }
 
-        const rebateRate = profile && profile.custom_affiliate_rate != null 
-            ? profile.custom_affiliate_rate 
+        const rebateRate = profile && profile.custom_affiliate_rate != null
+            ? profile.custom_affiliate_rate
             : 0.15;
         const ratePercent = Math.round(rebateRate * 100) + '%';
         const rebatePercentEl = document.getElementById('rules-rebate-percentage');
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .select('remaining_uses, accumulated_uses, expiration_dates, cash_balance_cny, cash_total_earned_cny, cash_balance_usd, cash_total_earned_usd')
                     .eq('user_id', user.id)
                     .maybeSingle();
-                
+
                 if (invError) {
                     console.warn('[Invite] Query invitations table failed. It might not be created yet.', invError);
                 } else {
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 将所有有效的邀请人过期日期加入列表（每笔算 5 次或剩余的额度）
             let tempRemaining = correctedInviterRemaining;
             const sortedInviterDates = validInviterDates.sort((a, b) => a - b);
-            
+
             sortedInviterDates.forEach(date => {
                 if (tempRemaining > 0) {
                     const amount = Math.min(3, tempRemaining);
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (expireEl) expireEl.textContent = window.inviteI18n ? window.inviteI18n.no_expiring_quota : '暂无即将过期的额度';
                 if (expireBanner) expireBanner.style.display = 'none';
             }
-            
+
             // 渲染推广收益钱包
             renderRebateWallet(invRecord);
         } catch (err) {
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const balanceCnyEl = document.getElementById('rebate-balance-cny');
         const earnedCnyEl = document.getElementById('rebate-earned-cny');
         const withdrawnCnyEl = document.getElementById('rebate-withdrawn-cny');
-        
+
         const balanceUsdEl = document.getElementById('rebate-balance-usd');
         const earnedUsdEl = document.getElementById('rebate-earned-usd');
         const withdrawnUsdEl = document.getElementById('rebate-withdrawn-usd');
@@ -551,13 +551,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnWithdraw.addEventListener('click', (e) => {
             e.preventDefault();
             if (hasPendingWithdrawal) {
-                Notifications.show(window.inviteI18n && window.inviteI18n.withdrawal_pending_limit_error 
-                    ? window.inviteI18n.withdrawal_pending_limit_error 
+                Notifications.show(window.inviteI18n && window.inviteI18n.withdrawal_pending_limit_error
+                    ? window.inviteI18n.withdrawal_pending_limit_error
                     : '您已有正在处理中的提现申请，需处理完毕后才能提交新的申请', 'warning');
                 return;
             }
             modal.classList.add('active');
-            
+
             // 使用 HTML 原生重置，自动恢复各语言模板预设的 selected 选项并清空所有输入框
             form.reset();
 
@@ -585,11 +585,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const currentBal = selectedCurrency === 'CNY' ? (availableBalanceCny / 100) : (availableBalanceUsd / 100);
             const minLimit = selectedCurrency === 'CNY' ? 100 : 20;
             const symbol = selectedCurrency === 'CNY' ? '¥' : '$';
-            
-            const hintTemplate = window.inviteI18n && window.inviteI18n.withdrawal_balance_hint 
-                ? window.inviteI18n.withdrawal_balance_hint 
+
+            const hintTemplate = window.inviteI18n && window.inviteI18n.withdrawal_balance_hint
+                ? window.inviteI18n.withdrawal_balance_hint
                 : "可提现余额: {symbol}{balance} (最低提现: {symbol}{min})";
-            
+
             amountHint.textContent = hintTemplate
                 .replace(/{symbol}/g, symbol)
                 .replace('{balance}', currentBal.toFixed(2))
@@ -776,7 +776,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (pendingRequests && pendingRequests.length > 0) {
                 hasPendingWithdrawal = true;
-                
+
                 // 汇总各币种的 pending 金额
                 const summaryParts = [];
                 const cnySum = pendingRequests
