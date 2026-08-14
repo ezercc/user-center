@@ -409,4 +409,179 @@ other = "Total Withdrawn"
 [request_withdrawal]
 other = "Request Withdrawal"
 
+[withdrawal_currency]
+other = "Withdrawal Currency"
 
+[withdrawal_amount]
+other = "Withdrawal Amount"
+
+[all_balance]
+other = "All"
+
+[withdrawal_method]
+other = "Withdrawal Method"
+
+[bank_transfer]
+other = "Bank Transfer"
+
+[bank_transfer_desc]
+other = "Corporate bank account transfer"
+
+[agreed_method]
+other = "Agreed Method"
+
+[agreed_method_desc]
+other = "Determined during KOL negotiation"
+
+[real_name]
+other = "Real Name"
+
+[real_name_placeholder]
+other = "Please enter recipient's real name"
+
+[bank_name]
+other = "Bank Name"
+
+[bank_name_placeholder]
+other = "e.g. Citibank, New York Branch"
+
+[card_number]
+other = "Card Number"
+
+[card_number_placeholder]
+other = "Please enter bank card number"
+
+[confirm_card_number]
+other = "Confirm Card Number"
+
+[confirm_card_number_placeholder]
+other = "Please enter bank card number again"
+
+[card_number_agreed]
+other = "Receiving Account"
+
+[card_number_agreed_placeholder]
+other = "Please enter receiving account (Alipay/WeChat/other agreed account)"
+
+[confirm_card_number_agreed]
+other = "Confirm Receiving Account"
+
+[confirm_card_number_agreed_placeholder]
+other = "Please enter receiving account again"
+
+[cancel]
+other = "Cancel"
+
+[submit_application]
+other = "Submit Request"
+
+[amount_required]
+other = "Please enter a valid withdrawal amount"
+
+[amount_exceed]
+other = "Withdrawal amount exceeds available balance"
+
+[name_required]
+other = "Please enter your real name"
+
+[bank_required]
+other = "Please enter the bank name"
+
+[card_required]
+other = "Please enter your card number"
+
+[card_required_agreed]
+other = "Please enter receiving account"
+
+[card_mismatch]
+other = "The card numbers entered do not match, please try again"
+
+[card_mismatch_agreed]
+other = "The receiving accounts entered do not match, please try again"
+
+[withdrawal_success]
+other = "Withdrawal request submitted successfully! We will process it as soon as possible."
+
+[withdrawal_failed]
+other = "Failed to submit withdrawal request, please try again later: "
+
+[amount_min_cny]
+other = "Minimum withdrawal amount for CNY is 100 RMB"
+
+[amount_min_usd]
+other = "Minimum withdrawal amount for USD is 20 USD"
+
+[bank_region]
+other = "Bank Region"
+
+[china_mainland]
+other = "China Mainland"
+
+[non_mainland]
+other = "Non-China Mainland Region"
+
+[bank_name_en]
+other = "Bank Name (English)"
+
+[bank_name_en_placeholder]
+other = "e.g. Citibank, N.A."
+
+[swift_code]
+other = "SWIFT Code"
+
+[swift_code_placeholder]
+other = "e.g. CITIUS33XXX"
+
+[bank_country]
+other = "Bank Country/Region"
+
+[bank_country_placeholder]
+other = "e.g. United States"
+
+[card_number_non_mainland]
+other = "Account Number/IBAN"
+
+[card_number_non_mainland_placeholder]
+other = "Please enter bank account number or IBAN"
+
+[confirm_card_number_non_mainland]
+other = "Confirm Account/IBAN"
+
+[confirm_card_number_non_mainland_placeholder]
+other = "Please enter bank account number or IBAN again to verify"
+
+[bank_name_en_required]
+other = "Please enter the bank name in English"
+
+[swift_required]
+other = "Please enter the SWIFT Code"
+
+[country_required]
+other = "Please enter the bank country/region"
+
+[intercept_redirect_log]
+other = "Intercepted auto-redirect, entering password reset interface."
+
+[new_email_same]
+other = "The new email cannot be the same as the current email."
+
+[password_error]
+other = "Incorrect current password, please try again."
+
+[recovery_lock_log]
+other = "🔒 Reset password flow detected, redirect logic locked."
+
+[verification_email_sent]
+other = "Verification email sent to new email address. Please check and confirm."
+
+[verifying_password]
+other = "Verifying current password..."
+
+[withdrawal_balance_hint]
+other = "Available Balance: {symbol}{balance} (Min withdrawal: {symbol}{min})"
+
+[withdrawal_pending_hint]
+other = "You have a pending withdrawal of {amount} in progress. New requests are locked."
+
+[withdrawal_pending_limit_error]
+other = "You already have a pending withdrawal request. Please wait for it to be processed."

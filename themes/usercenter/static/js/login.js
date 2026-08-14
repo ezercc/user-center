@@ -5,6 +5,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hash = window.location.hash;
     const isRecoveryFlow = hash && hash.includes('type=recovery');
 
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost && !isRecoveryFlow) {
+        console.log('[Login] Dev mode: Bypassing login on localhost');
+        const params = new URLSearchParams(window.location.search);
+        let redirect = params.get('redirect') || '/';
+        
+        if (redirect.startsWith('http://localhost') || redirect.startsWith('http://127.0.0.1')) {
+            window.location.href = redirect;
+        } else {
+            if (redirect.includes('account.ezer.cc')) {
+                try {
+                    const url = new URL(redirect);
+                    redirect = url.pathname + url.search;
+                } catch(e) {}
+            }
+            if (!redirect.startsWith('/')) {
+                redirect = '/' + redirect;
+            }
+            window.location.href = window.location.origin + redirect;
+        }
+        return;
+    }
+
     if (isRecoveryFlow) {
         console.log(window.i18n ? window.i18n.recovery_lock_log : "🔒 检测到重置密码流程，已锁定跳转逻辑。");
     }

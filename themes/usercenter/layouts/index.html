@@ -118,7 +118,7 @@
     </div>
 </main>
 
-<script src="{{ absURL "js/common.js"}}"></script>
+<script src="{{ "js/common.js" | relURL }}?v=5"></script>
 <script type="text/javascript">
     window.userI18n = {
         bind: '{{ T "bind" | default "绑定" }}',
@@ -134,7 +134,7 @@
         verification_email_sent: '{{ T "verification_email_sent" | default "验证邮件已发送至新邮箱，请查收确认" }}'
     };
 </script>
-<script src="{{ absURL "js/user.js"}}"></script>
+<script src="{{ "js/user.js" | relURL }}?v=5"></script>
 </body>
 
 </html>

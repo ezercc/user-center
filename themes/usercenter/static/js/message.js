@@ -2,10 +2,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof client === 'undefined') return;
 
     // 1. 验证登录
-    const { data: { session }, error } = await client.auth.getSession();
-    if (error || !session) {
-        window.location.href = getLoginUrl('/message/');
-        return;
+    let session = null;
+    try {
+        const { data, error: sessionError } = await client.auth.getSession();
+        if (!sessionError && data && data.session) {
+            session = data.session;
+        }
+    } catch (e) {
+        console.warn('获取 session 失败:', e);
+    }
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!session) {
+        if (isLocalhost) {
+            console.log('[Message] 本地开发环境：模拟登录状态');
+            session = {
+                user: {
+                    id: 'dev-mock-user-id',
+                    email: 'dev-user@ezer.cc'
+                }
+            };
+        } else {
+            window.location.href = getLoginUrl('/message/');
+            return;
+        }
     }
     const myId = session.user.id;
 
