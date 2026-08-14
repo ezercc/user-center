@@ -5,7 +5,7 @@ other = "Current plan"
 other = "Free"
 
 [pro_plan]
-other = "Pro"
+other = "Premium"
 
 [upgrade]
 other = "Upgrade"
