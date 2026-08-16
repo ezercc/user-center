@@ -34,6 +34,7 @@ home = ["HTML", "JSON"]
 [params]
     author        = "Ezer"
     description   = "Ezer账号。用户可以登陆账号并在此处修改账号信息，绑定第三方账号登录方式，向其他用户发送站内私信。"
+    withdrawalFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfD_YOUR_GOOGLE_FORM_ID/viewform"
 
 [params.images]
     favicon       = "/favicon.png"

@@ -37,6 +37,142 @@ const client = supabase.createClient(supabaseUrl, supabaseKey, {
 });
 
 // ----------------------------------------------------------------
+// 侧边栏账户与订阅管理器
+// ----------------------------------------------------------------
+const AccountPlan = {
+    portalUrl: 'https://msufgvqofnihylcnxyac.supabase.co/functions/v1/create-stripe-portal',
+
+    getElements() {
+        const root = document.getElementById('dashboard-account-plan');
+        if (!root) return null;
+
+        return {
+            root,
+            planName: document.getElementById('dashboard-plan-name'),
+            action: document.getElementById('dashboard-plan-action'),
+            expiry: document.getElementById('dashboard-plan-expiry'),
+            expiryRow: document.getElementById('dashboard-plan-expiry-row')
+        };
+    },
+
+    setAction(elements, label, onClick) {
+        elements.action.hidden = false;
+        elements.action.textContent = label;
+        elements.action.removeAttribute('href');
+        elements.action.onclick = onClick;
+    },
+
+    showFree(elements) {
+        elements.planName.textContent = elements.root.dataset.freePlan;
+        if (elements.expiryRow) elements.expiryRow.hidden = true;
+        this.setAction(elements, elements.root.dataset.upgrade, null);
+        const locale = elements.root.dataset.locale === 'en' ? 'en' : 'zh';
+        elements.action.href = locale === 'en'
+            ? 'https://www.ezer.cc/en/premium/'
+            : 'https://www.ezer.cc/premium/';
+    },
+
+    showUnavailable(elements) {
+        elements.planName.textContent = elements.root.dataset.unavailable;
+        elements.action.hidden = true;
+        if (elements.expiryRow) elements.expiryRow.hidden = true;
+    },
+
+    showPremium(elements, session, paidThrough) {
+        const locale = elements.root.dataset.locale === 'en' ? 'en' : 'zh';
+        const formattedDate = new Intl.DateTimeFormat(locale === 'en' ? 'en' : 'zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }).format(paidThrough);
+
+        elements.planName.textContent = elements.root.dataset.proPlan;
+        if (elements.expiryRow) {
+            elements.expiryRow.hidden = false;
+            elements.expiry.textContent = formattedDate;
+        }
+        this.setAction(elements, elements.root.dataset.manage, () => this.openPortal(elements, session));
+    },
+
+    async openPortal(elements, session) {
+        const button = elements.action;
+        if (button.dataset.loading === 'true') return;
+
+        button.dataset.loading = 'true';
+        button.setAttribute('aria-disabled', 'true');
+        button.classList.add('is-loading');
+        button.textContent = elements.root.dataset.openingPortal;
+
+        try {
+            const response = await fetch(this.portalUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ locale: elements.root.dataset.locale === 'en' ? 'en' : 'zh' })
+            });
+            const data = await response.json().catch(() => null);
+            const portalUrl = data?.url;
+            const parsedUrl = portalUrl ? new URL(portalUrl) : null;
+
+            if (!response.ok || !parsedUrl || parsedUrl.protocol !== 'https:' || !parsedUrl.hostname.endsWith('.stripe.com')) {
+                throw new Error('Could not open billing portal');
+            }
+
+            window.location.assign(parsedUrl.toString());
+        } catch (error) {
+            console.error('Stripe portal request failed:', error);
+            Notifications.show(elements.root.dataset.portalError, 'error');
+            button.dataset.loading = 'false';
+            button.removeAttribute('aria-disabled');
+            button.classList.remove('is-loading');
+            button.textContent = elements.root.dataset.manage;
+        }
+    },
+
+    async init() {
+        const elements = this.getElements();
+        if (!elements) return;
+
+        try {
+            const { data: { session } } = await client.auth.getSession();
+            if (!session) {
+                elements.root.hidden = true;
+                return;
+            }
+
+            const { data: plan, error } = await client
+                .from('user_plans')
+                .select('plan_type, paid_through, billing_status, billing_current_period_end, cancel_at_period_end')
+                .eq('uid', session.user.id)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Subscription status lookup failed:', error);
+                this.showUnavailable(elements);
+                return;
+            }
+
+            const paidThrough = plan?.paid_through ? new Date(plan.paid_through) : null;
+            const hasActivePremium = plan?.plan_type === 'premium'
+                && paidThrough
+                && !Number.isNaN(paidThrough.getTime())
+                && paidThrough > new Date();
+
+            if (hasActivePremium) {
+                this.showPremium(elements, session, paidThrough);
+            } else {
+                this.showFree(elements);
+            }
+        } catch (error) {
+            console.error('Subscription status initialization failed:', error);
+            this.showUnavailable(elements);
+        }
+    }
+};
+
+// ----------------------------------------------------------------
 // 全局未读消息管理器
 // ----------------------------------------------------------------
 const UnreadBadge = {
@@ -204,6 +340,7 @@ const AppLayout = {
 
         this.initTheme();
         this.initSidebar();
+        AccountPlan.init();
 
         // >>> 启动全局未读检测 <<<
         UnreadBadge.init();

@@ -52,7 +52,7 @@
         </div>
     </main>
 
-    <script src="{{ absURL "js/common.js"}}"></script>
+    <script src="{{ "js/common.js" | relURL }}?v=5"></script>
     <script type="text/javascript">
         window.messageI18n = {
             system_notifications: '{{ T "system_notifications" | default "站内通知" }}',
@@ -62,6 +62,6 @@
             load_messages_failed: '{{ T "load_messages_failed" | default "消息加载失败" }}'
         };
     </script>
-    <script src="{{ absURL "js/message.js"}}"></script>
+    <script src="{{ "js/message.js" | relURL }}?v=5"></script>
 </body>
 </html>

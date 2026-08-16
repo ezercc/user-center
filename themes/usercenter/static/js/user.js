@@ -5,10 +5,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 1. 检查 Session
-    const { data: { session }, error } = await client.auth.getSession();
-    if (error || !session) {
-        window.location.href = getLoginUrl('/');
-        return;
+    let session = null;
+    try {
+        const { data, error: sessionError } = await client.auth.getSession();
+        if (!sessionError && data && data.session) {
+            session = data.session;
+        }
+    } catch (e) {
+        console.warn('获取 session 失败:', e);
+    }
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!session) {
+        if (isLocalhost) {
+            console.log('[User] 本地开发环境：模拟登录状态');
+            session = {
+                user: {
+                    id: 'dev-mock-user-id',
+                    email: 'dev-user@ezer.cc'
+                }
+            };
+        } else {
+            window.location.href = getLoginUrl('/');
+            return;
+        }
     }
 
     const user = session.user;
@@ -21,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 格式化日期
     const lang = document.documentElement.lang || 'zh-CN';
-    const regDate = new Date(user.created_at);
+    const regDate = user.created_at ? new Date(user.created_at) : new Date();
     document.getElementById('user-reg-date').textContent = regDate.toLocaleDateString(lang, {
         year: 'numeric', month: 'long', day: 'numeric'
     });

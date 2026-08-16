@@ -1,3 +1,33 @@
+[current_plan]
+other = "当前计划"
+
+[free_plan]
+other = "免费版"
+
+[pro_plan]
+other = "专业版"
+
+[upgrade]
+other = "升级"
+
+[manage_subscription]
+other = "管理"
+
+[pro_valid_until]
+other = "专业版有效期至 {date}"
+
+[subscription_loading]
+other = "正在加载订阅信息..."
+
+[subscription_unavailable]
+other = "加载失败"
+
+[opening_subscription_portal]
+other = "正在打开订阅管理页面..."
+
+[subscription_portal_error]
+other = "无法打开订阅管理页面，请稍后重试"
+
 [account_settings]
 other = "账号设置"
 
@@ -353,10 +383,205 @@ other = "邀请规则"
 other = "<strong>新用户福利</strong>：使用邀请码注册的新用户，可获得 <strong>3次</strong> 额外额度。"
 
 [invite_rules_item_2]
-other = "<strong>邀请奖励</strong>：每成功邀请一位新用户注册，您将获得 <strong>5次</strong> 额外额度奖励。"
+other = "<strong>邀请奖励</strong>：每成功邀请一位新用户注册，您将获得 <strong>3次</strong> 额外额度奖励。"
 
 [invite_rules_item_3]
 other = "<strong>额度扣减</strong>：邀请奖励在邀请成功后 <strong>1个月</strong> 内有效，系统会优先扣减每月的常规免费额度，消耗完毕后自动使用邀请奖励额度。"
 
+[invite_rules_item_4]
+other = "<strong>订阅返利</strong>：受邀好友在注册后进行付费订阅，您将获得其订阅支付金额的 <strong id=\"rules-rebate-percentage\">--</strong> 现金返利（多币种支持，可提现）。"
 
+[valid_until]
+other = "有效期"
 
+[rebate_statistics]
+other = "推广收益"
+
+[available_balance]
+other = "可提现余额"
+
+[total_earned]
+other = "累计总收益"
+
+[total_withdrawn]
+other = "已提现额度"
+
+[request_withdrawal]
+other = "申请提现"
+
+[withdrawal_currency]
+other = "提现币种"
+
+[withdrawal_amount]
+other = "提现金额"
+
+[all_balance]
+other = "全部"
+
+[withdrawal_method]
+other = "提现方式"
+
+[bank_transfer]
+other = "银行汇款"
+
+[bank_transfer_desc]
+other = "公司对公账户汇款"
+
+[agreed_method]
+other = "约定的提现方式"
+
+[agreed_method_desc]
+other = "KOL合作洽谈时确定"
+
+[real_name]
+other = "真实姓名"
+
+[real_name_placeholder]
+other = "请输入收款人真实姓名"
+
+[bank_name]
+other = "开户银行（具体到支行名）"
+
+[bank_name_placeholder]
+other = "例如：中国工商银行北京海淀支行"
+
+[card_number]
+other = "银行卡号"
+
+[card_number_placeholder]
+other = "请输入银行卡号"
+
+[confirm_card_number]
+other = "确认银行卡号"
+
+[confirm_card_number_placeholder]
+other = "请再次输入银行卡号以核对"
+
+[card_number_agreed]
+other = "收款账号"
+
+[card_number_agreed_placeholder]
+other = "请输入收款账号（如支付宝/微信/其他约定账号）"
+
+[confirm_card_number_agreed]
+other = "确认收款账号"
+
+[confirm_card_number_agreed_placeholder]
+other = "请再次输入收款账号以核对"
+
+[cancel]
+other = "取消"
+
+[submit_application]
+other = "提交申请"
+
+[amount_required]
+other = "请填写有效的提现金额"
+
+[amount_exceed]
+other = "提现金额已超过可提现余额"
+
+[name_required]
+other = "请填写真实姓名"
+
+[bank_required]
+other = "请填写开户银行"
+
+[card_required]
+other = "请填写银行卡号"
+
+[card_required_agreed]
+other = "请填写收款账号"
+
+[card_mismatch]
+other = "两次输入的银行卡号不一致，请重新输入"
+
+[card_mismatch_agreed]
+other = "两次输入的收款账号不一致，请重新输入"
+
+[withdrawal_success]
+other = "提现申请已成功提交，我们将尽快为您处理！"
+
+[withdrawal_failed]
+other = "提交提现申请失败，请稍后重试："
+
+[amount_min_cny]
+other = "人民币最低提现金额为100元"
+
+[amount_min_usd]
+other = "美元最低提现金额为20美金"
+
+[bank_region]
+other = "银行属地"
+
+[china_mainland]
+other = "中国大陆"
+
+[non_mainland]
+other = "非中国大陆地区"
+
+[bank_name_en]
+other = "银行英文名称"
+
+[bank_name_en_placeholder]
+other = "例如：Citibank, N.A."
+
+[swift_code]
+other = "SWIFT Code"
+
+[swift_code_placeholder]
+other = "例如：CITIUS33XXX"
+
+[bank_country]
+other = "银行国家/地区"
+
+[bank_country_placeholder]
+other = "例如：United States"
+
+[card_number_non_mainland]
+other = "银行账号/IBAN"
+
+[card_number_non_mainland_placeholder]
+other = "请输入银行账号或IBAN"
+
+[confirm_card_number_non_mainland]
+other = "确认账号/IBAN"
+
+[confirm_card_number_non_mainland_placeholder]
+other = "请再次输入银行账号或IBAN以核对"
+
+[bank_name_en_required]
+other = "请填写银行英文名称"
+
+[swift_required]
+other = "请填写 SWIFT Code"
+
+[country_required]
+other = "请填写银行国家/地区"
+
+[intercept_redirect_log]
+other = "拦截自动跳转，进入重置密码界面"
+
+[new_email_same]
+other = "新邮箱不能与当前邮箱相同"
+
+[password_error]
+other = "原密码错误，请重新输入"
+
+[recovery_lock_log]
+other = "🔒 检测到重置密码流程，已锁定跳转逻辑。"
+
+[verification_email_sent]
+other = "验证邮件已发送至新邮箱，请查收确认"
+
+[verifying_password]
+other = "正在验证原密码..."
+
+[withdrawal_balance_hint]
+other = "可提现余额: {symbol}{balance} (最低提现: {symbol}{min})"
+
+[withdrawal_pending_hint]
+other = "您有 {amount} 提现正在等待处理，暂不能提交新的提现申请"
+
+[withdrawal_pending_limit_error]
+other = "您已有正在处理中的提现申请，需处理完毕后才能提交新的申请"

@@ -5,19 +5,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 1. 检查 Session
-    const { data: { session }, error: sessionError } = await client.auth.getSession();
-    if (sessionError || !session) {
-        window.location.href = getLoginUrl(window.location.pathname);
-        return;
+    let session = null;
+    try {
+        const { data, error: sessionError } = await client.auth.getSession();
+        if (!sessionError && data && data.session) {
+            session = data.session;
+        }
+    } catch (e) {
+        console.warn('获取 session 失败:', e);
+    }
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!session) {
+        if (isLocalhost) {
+            console.log('[Invite] 本地开发环境：模拟登录状态');
+            session = {
+                user: {
+                    id: 'dev-mock-user-id',
+                    email: 'dev-user@ezer.cc'
+                }
+            };
+        } else {
+            window.location.href = getLoginUrl(window.location.pathname);
+            return;
+        }
     }
 
     const user = session.user;
     let inviteCode = '';
+    let availableBalanceCny = 0;
+    let availableBalanceUsd = 0;
+    let hasPendingWithdrawal = false;
 
     console.log('[Invite] DOMContentLoaded. Current User ID:', user.id, 'Email:', user.email);
 
     // 初始化加载
     try {
+        initWithdrawalModal();
         await initInvitePage();
     } catch (err) {
         console.error('[Invite] Failed to initialize invite page:', err);
@@ -27,10 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 初始化核心逻辑
     async function initInvitePage() {
         console.log('[Invite] Fetching profile from database for ID:', user.id);
-        // A. 从 profiles 表获取当前用户的邀请码
+        // A. 从 profiles 表获取当前用户的邀请码和自定义返利比率
         let { data: profile, error: profileError } = await client
             .from('profiles')
-            .select('invitation_code')
+            .select('invitation_code, custom_affiliate_rate')
             .eq('id', user.id)
             .maybeSingle();
 
@@ -64,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             inviteCode = profile.invitation_code;
         }
 
-        // B. 渲染邀请码与邀请链接
+        // B. 渲染邀请码与邀请链接，并根据具体用户的返利比率更新规则说明
         const codeDisplay = document.getElementById('invite-code-display');
         const linkInput = document.getElementById('invite-link-input');
 
@@ -72,12 +96,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 动态构建链接：指向产品落地页，并支持多语言
         const isEn = window.location.pathname.startsWith('/en/');
-        const fullInviteLink = isEn 
+        const fullInviteLink = isEn
             ? `https://www.ezer.cc/en/?aff=${inviteCode}`
             : `https://www.ezer.cc/?aff=${inviteCode}`;
 
         if (linkInput) {
             linkInput.value = fullInviteLink;
+        }
+
+        const rebateRate = profile && profile.custom_affiliate_rate != null
+            ? profile.custom_affiliate_rate
+            : 0.15;
+        const ratePercent = Math.round(rebateRate * 100) + '%';
+        const rebatePercentEl = document.getElementById('rules-rebate-percentage');
+        if (rebatePercentEl) {
+            rebatePercentEl.textContent = ratePercent;
         }
 
         // C. 设置复制按钮监听
@@ -88,6 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // E. 载入使用额度统计
         await loadQuotaStatistics();
+
+        // F. 查询并加载待处理的提现申请状态
+        await checkPendingWithdrawals();
     }
 
     // 随机大写 8 位字符生成器 (自愈模式 fallback)
@@ -274,10 +310,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const { data, error: invError } = await client
                     .from('invitations')
-                    .select('remaining_uses, accumulated_uses, expiration_dates')
+                    .select('remaining_uses, accumulated_uses, expiration_dates, cash_balance_cny, cash_total_earned_cny, cash_balance_usd, cash_total_earned_usd')
                     .eq('user_id', user.id)
                     .maybeSingle();
-                
+
                 if (invError) {
                     console.warn('[Invite] Query invitations table failed. It might not be created yet.', invError);
                 } else {
@@ -319,8 +355,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .map(d => new Date(d))
                 .filter(d => d > now);
 
-            // 本地校正后的邀请人可用额度上限 = 有效未过期数量 * 5
-            const localMaxInviterQuota = validInviterDates.length * 5;
+            // 本地校正后的邀请人可用额度上限 = 有效未过期数量 * 3
+            const localMaxInviterQuota = validInviterDates.length * 3;
             const correctedInviterRemaining = Math.min(inviterRemaining, localMaxInviterQuota);
 
             // D. 汇总结果
@@ -344,10 +380,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 将所有有效的邀请人过期日期加入列表（每笔算 5 次或剩余的额度）
             let tempRemaining = correctedInviterRemaining;
             const sortedInviterDates = validInviterDates.sort((a, b) => a - b);
-            
+
             sortedInviterDates.forEach(date => {
                 if (tempRemaining > 0) {
-                    const amount = Math.min(5, tempRemaining);
+                    const amount = Math.min(3, tempRemaining);
                     expirationList.push({ date, amount });
                     tempRemaining -= amount;
                 }
@@ -374,12 +410,420 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (expireEl) expireEl.textContent = window.inviteI18n ? window.inviteI18n.no_expiring_quota : '暂无即将过期的额度';
                 if (expireBanner) expireBanner.style.display = 'none';
             }
+
+            // 渲染推广收益钱包
+            renderRebateWallet(invRecord);
         } catch (err) {
             console.error('[Invite] Failed to process quota stats:', err);
             if (remainingEl) remainingEl.textContent = '-';
             if (accumulatedEl) accumulatedEl.textContent = '-';
             if (expireEl) expireEl.textContent = '加载出错';
             if (expireBanner) expireBanner.style.display = 'none';
+            renderRebateWallet(null);
+        }
+    }
+
+    // 渲染返利钱包的具体数据及处理计算
+    function renderRebateWallet(invRecord) {
+        const balanceCnyEl = document.getElementById('rebate-balance-cny');
+        const earnedCnyEl = document.getElementById('rebate-earned-cny');
+        const withdrawnCnyEl = document.getElementById('rebate-withdrawn-cny');
+
+        const balanceUsdEl = document.getElementById('rebate-balance-usd');
+        const earnedUsdEl = document.getElementById('rebate-earned-usd');
+        const withdrawnUsdEl = document.getElementById('rebate-withdrawn-usd');
+
+        const balanceCny = invRecord ? (invRecord.cash_balance_cny || 0) : 0;
+        const earnedCny = invRecord ? (invRecord.cash_total_earned_cny || 0) : 0;
+        const withdrawnCny = Math.max(0, earnedCny - balanceCny);
+
+        const balanceUsd = invRecord ? (invRecord.cash_balance_usd || 0) : 0;
+        const earnedUsd = invRecord ? (invRecord.cash_total_earned_usd || 0) : 0;
+        const withdrawnUsd = Math.max(0, earnedUsd - balanceUsd);
+
+        // 保存余额全局变量供模态框使用
+        availableBalanceCny = balanceCny;
+        availableBalanceUsd = balanceUsd;
+
+        if (balanceCnyEl) balanceCnyEl.textContent = (balanceCny / 100).toFixed(2);
+        if (earnedCnyEl) earnedCnyEl.textContent = (earnedCny / 100).toFixed(2);
+        if (withdrawnCnyEl) withdrawnCnyEl.textContent = (withdrawnCny / 100).toFixed(2);
+
+        if (balanceUsdEl) balanceUsdEl.textContent = (balanceUsd / 100).toFixed(2);
+        if (earnedUsdEl) earnedUsdEl.textContent = (earnedUsd / 100).toFixed(2);
+        if (withdrawnUsdEl) withdrawnUsdEl.textContent = (withdrawnUsd / 100).toFixed(2);
+
+        // 动态绑定到提现模态框中的余额显示
+        const modalBalCnyEl = document.getElementById('modal-bal-cny');
+        const modalBalUsdEl = document.getElementById('modal-bal-usd');
+        if (modalBalCnyEl) modalBalCnyEl.textContent = (balanceCny / 100).toFixed(2);
+        if (modalBalUsdEl) modalBalUsdEl.textContent = (balanceUsd / 100).toFixed(2);
+    }
+
+    // 初始化提现申请模态框表单与逻辑
+    function initWithdrawalModal() {
+        const btnWithdraw = document.getElementById('btn-request-withdrawal');
+        const modal = document.getElementById('withdrawal-modal');
+        const btnCloseModal = document.getElementById('btn-close-withdrawal-modal');
+        const btnCancelWithdrawal = document.getElementById('btn-cancel-withdrawal');
+        const form = document.getElementById('withdrawal-form');
+
+        const inputAmount = document.getElementById('withdrawal-amount');
+        const amountHint = document.getElementById('amount-hint-text');
+        const btnAmountAll = document.getElementById('btn-amount-all');
+
+        const bankFields = document.getElementById('bank-fields-container');
+        const bankRegionGroup = document.getElementById('bank-region-group');
+        const inputBankRegion = document.getElementById('withdrawal-bank-region');
+        const bankMainlandFields = document.getElementById('bank-mainland-fields');
+        const bankNonMainlandFields = document.getElementById('bank-non-mainland-fields');
+
+        const inputRealName = document.getElementById('withdrawal-real-name');
+        const inputBankName = document.getElementById('withdrawal-bank-name');
+        const inputBankNameEn = document.getElementById('withdrawal-bank-name-en');
+        const inputBankSwift = document.getElementById('withdrawal-bank-swift');
+        const inputBankCountry = document.getElementById('withdrawal-bank-country');
+
+        const inputCardNum = document.getElementById('withdrawal-card-number');
+        const inputCardNumConfirm = document.getElementById('withdrawal-card-number-confirm');
+        const btnSubmit = document.getElementById('btn-submit-withdrawal');
+
+        let selectedCurrency = 'CNY';
+        let selectedMethod = 'bank';
+        let selectedRegion = 'mainland';
+
+        if (!modal || !btnWithdraw) return;
+
+        // 统一更新表单可见性与字段必填属性
+        function updateFormFields() {
+            const labelCardNum = document.getElementById('label-card-number');
+            const labelCardNumConfirm = document.getElementById('label-card-number-confirm');
+            const i18n = window.inviteI18n || {};
+
+            if (selectedMethod === 'bank') {
+                bankFields.style.display = 'block';
+                bankRegionGroup.style.display = 'block';
+
+                if (selectedRegion === 'mainland') {
+                    bankMainlandFields.style.display = 'block';
+                    bankNonMainlandFields.style.display = 'none';
+
+                    inputBankName.setAttribute('required', 'required');
+                    inputBankNameEn.removeAttribute('required');
+                    inputBankSwift.removeAttribute('required');
+                    inputBankCountry.removeAttribute('required');
+
+                    if (labelCardNum) labelCardNum.textContent = i18n.card_number || '银行卡号';
+                    if (labelCardNumConfirm) labelCardNumConfirm.textContent = i18n.confirm_card_number || '确认银行卡号';
+                    inputCardNum.setAttribute('placeholder', i18n.card_number_placeholder || '请输入银行卡号');
+                    inputCardNumConfirm.setAttribute('placeholder', i18n.confirm_card_number_placeholder || '请再次输入银行卡号以核对');
+                } else {
+                    bankMainlandFields.style.display = 'none';
+                    bankNonMainlandFields.style.display = 'block';
+
+                    inputBankName.removeAttribute('required');
+                    inputBankNameEn.setAttribute('required', 'required');
+                    inputBankSwift.setAttribute('required', 'required');
+                    inputBankCountry.setAttribute('required', 'required');
+
+                    if (labelCardNum) labelCardNum.textContent = i18n.card_number_non_mainland || '银行账号/IBAN (Account Number/IBAN)';
+                    if (labelCardNumConfirm) labelCardNumConfirm.textContent = i18n.confirm_card_number_non_mainland || '确认账号/IBAN';
+                    inputCardNum.setAttribute('placeholder', i18n.card_number_non_mainland_placeholder || '请输入银行账号或IBAN');
+                    inputCardNumConfirm.setAttribute('placeholder', i18n.confirm_card_number_non_mainland_placeholder || '请再次输入银行账号或IBAN以核对');
+                }
+            } else {
+                bankFields.style.display = 'none';
+                bankRegionGroup.style.display = 'none';
+
+                inputBankName.removeAttribute('required');
+                inputBankNameEn.removeAttribute('required');
+                inputBankSwift.removeAttribute('required');
+                inputBankCountry.removeAttribute('required');
+
+                if (labelCardNum) labelCardNum.textContent = i18n.card_number_agreed || '收款账号';
+                if (labelCardNumConfirm) labelCardNumConfirm.textContent = i18n.confirm_card_number_agreed || '确认收款账号';
+                inputCardNum.setAttribute('placeholder', i18n.card_number_agreed_placeholder || '请输入收款账号（如支付宝/微信/其他约定账号）');
+                inputCardNumConfirm.setAttribute('placeholder', i18n.confirm_card_number_agreed_placeholder || '请再次输入收款账号以核对');
+            }
+        }
+
+        // 打开模态框
+        btnWithdraw.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (hasPendingWithdrawal) {
+                Notifications.show(window.inviteI18n && window.inviteI18n.withdrawal_pending_limit_error
+                    ? window.inviteI18n.withdrawal_pending_limit_error
+                    : '您已有正在处理中的提现申请，需处理完毕后才能提交新的申请', 'warning');
+                return;
+            }
+            modal.classList.add('active');
+
+            // 使用 HTML 原生重置，自动恢复各语言模板预设的 selected 选项并清空所有输入框
+            form.reset();
+
+            selectedCurrency = form.elements['currency'].value;
+            selectedMethod = form.elements['payment_method'].value;
+            selectedRegion = form.elements['bank_region'].value;
+
+            updateFormFields();
+            updateBalanceDisplay();
+        });
+
+        // 关闭模态框
+        const closeModal = () => {
+            modal.classList.remove('active');
+        };
+
+        if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
+        if (btnCancelWithdrawal) btnCancelWithdrawal.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // 更新余额显示与验证提示
+        function updateBalanceDisplay() {
+            const currentBal = selectedCurrency === 'CNY' ? (availableBalanceCny / 100) : (availableBalanceUsd / 100);
+            const minLimit = selectedCurrency === 'CNY' ? 100 : 20;
+            const symbol = selectedCurrency === 'CNY' ? '¥' : '$';
+
+            const hintTemplate = window.inviteI18n && window.inviteI18n.withdrawal_balance_hint
+                ? window.inviteI18n.withdrawal_balance_hint
+                : "可提现余额: {symbol}{balance} (最低提现: {symbol}{min})";
+
+            amountHint.textContent = hintTemplate
+                .replace(/{symbol}/g, symbol)
+                .replace('{balance}', currentBal.toFixed(2))
+                .replace('{min}', minLimit);
+
+            inputAmount.setAttribute('max', currentBal.toFixed(2));
+            inputAmount.setAttribute('min', minLimit);
+        }
+
+        // 切换下拉菜单时更新可见性与验证
+        form.addEventListener('change', (e) => {
+            if (e.target.name === 'currency') {
+                selectedCurrency = e.target.value;
+                updateBalanceDisplay();
+            }
+
+            if (e.target.name === 'payment_method') {
+                selectedMethod = e.target.value;
+                updateFormFields();
+            }
+
+            if (e.target.name === 'bank_region') {
+                selectedRegion = e.target.value;
+                updateFormFields();
+            }
+        });
+
+        // 点击 "全部" 自动输入余额
+        if (btnAmountAll) {
+            btnAmountAll.addEventListener('click', () => {
+                const currentBal = selectedCurrency === 'CNY' ? (availableBalanceCny / 100) : (availableBalanceUsd / 100);
+                inputAmount.value = currentBal.toFixed(2);
+            });
+        }
+
+        // 表单提交事件
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const i18n = window.inviteI18n || {};
+            const amountVal = parseFloat(inputAmount.value);
+            const currentBal = selectedCurrency === 'CNY' ? (availableBalanceCny / 100) : (availableBalanceUsd / 100);
+
+            // 验证提现金额
+            if (isNaN(amountVal) || amountVal <= 0) {
+                Notifications.show(i18n.amount_required || '请填写有效的提现金额', 'error');
+                return;
+            }
+
+            if (amountVal > currentBal) {
+                Notifications.show(i18n.amount_exceed || '提现金额已超过可提现余额', 'error');
+                return;
+            }
+
+            // 验证最低提现金额限制
+            if (selectedCurrency === 'CNY' && amountVal < 100) {
+                Notifications.show(i18n.amount_min_cny || '人民币最低提现金额为100元', 'error');
+                return;
+            }
+            if (selectedCurrency === 'USD' && amountVal < 20) {
+                Notifications.show(i18n.amount_min_usd || '美元最低提现金额为20美金', 'error');
+                return;
+            }
+
+            // 验证真实姓名
+            const realName = inputRealName.value.trim();
+            if (!realName) {
+                Notifications.show(i18n.name_required || '请填写真实姓名', 'error');
+                return;
+            }
+
+            let bankName = '';
+            let cardNumber = '';
+
+            // 验证银行汇款或约定方式的账号信息
+            if (selectedMethod === 'bank') {
+                cardNumber = inputCardNum.value.trim();
+                const cardNumberConfirm = inputCardNumConfirm.value.trim();
+
+                if (selectedRegion === 'mainland') {
+                    bankName = inputBankName.value.trim();
+                    if (!bankName) {
+                        Notifications.show(i18n.bank_required || '请填写开户银行', 'error');
+                        return;
+                    }
+                } else {
+                    const bankNameEn = inputBankNameEn.value.trim();
+                    const swiftCode = inputBankSwift.value.trim();
+                    const country = inputBankCountry.value.trim();
+
+                    if (!bankNameEn) {
+                        Notifications.show(i18n.bank_name_en_required || '请填写银行英文名称', 'error');
+                        return;
+                    }
+                    if (!swiftCode) {
+                        Notifications.show(i18n.swift_required || '请填写 SWIFT Code', 'error');
+                        return;
+                    }
+                    if (!country) {
+                        Notifications.show(i18n.country_required || '请填写银行国家/地区', 'error');
+                        return;
+                    }
+                    bankName = `${bankNameEn} (SWIFT: ${swiftCode}, Country: ${country})`;
+                }
+
+                if (!cardNumber) {
+                    Notifications.show(i18n.card_required || '请填写银行卡号', 'error');
+                    return;
+                }
+                if (cardNumber !== cardNumberConfirm) {
+                    Notifications.show(i18n.card_mismatch || '两次输入的银行卡号不一致，请重新输入', 'error');
+                    return;
+                }
+            } else {
+                cardNumber = inputCardNum.value.trim();
+                const cardNumberConfirm = inputCardNumConfirm.value.trim();
+
+                if (!cardNumber) {
+                    Notifications.show(i18n.card_required_agreed || '请填写收款账号', 'error');
+                    return;
+                }
+                if (cardNumber !== cardNumberConfirm) {
+                    Notifications.show(i18n.card_mismatch_agreed || '两次输入的收款账号不一致，请重新输入', 'error');
+                    return;
+                }
+            }
+
+            // 提交数据至 Supabase
+            btnSubmit.disabled = true;
+            const originalText = btnSubmit.textContent;
+            btnSubmit.textContent = '提交中...';
+
+            try {
+                const amountCents = Math.round(amountVal * 100);
+
+                const { error: insertError } = await client
+                    .from('withdrawal_requests')
+                    .insert({
+                        user_id: user.id,
+                        amount: amountCents,
+                        currency: selectedCurrency,
+                        payment_method: selectedMethod,
+                        real_name: realName,
+                        bank_name: bankName,
+                        card_number: cardNumber,
+                        status: 'pending'
+                    });
+
+                if (insertError) {
+                    throw insertError;
+                }
+
+                Notifications.show(i18n.withdrawal_success || '提现申请已成功提交，我们将尽快为您处理！', 'success');
+                closeModal();
+                await checkPendingWithdrawals();
+            } catch (err) {
+                console.error('Submit withdrawal request failed:', err);
+                Notifications.show((i18n.withdrawal_failed || '提交提现申请失败，请稍后重试：') + (err.message || JSON.stringify(err)), 'error');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = originalText;
+            }
+        });
+    }
+
+    // 查询并更新未决（pending）提现状态
+    async function checkPendingWithdrawals() {
+        console.log('[Invite] Checking pending withdrawal requests for user:', user.id);
+        const banner = document.getElementById('withdrawal-pending-banner');
+        const bannerText = document.getElementById('withdrawal-pending-text');
+        const btnWithdraw = document.getElementById('btn-request-withdrawal');
+
+        try {
+            const { data: pendingRequests, error: pendingError } = await client
+                .from('withdrawal_requests')
+                .select('amount, currency')
+                .eq('user_id', user.id)
+                .eq('status', 'pending');
+
+            if (pendingError) {
+                console.warn('[Invite] Query pending withdrawal requests failed:', pendingError);
+                return;
+            }
+
+            if (pendingRequests && pendingRequests.length > 0) {
+                hasPendingWithdrawal = true;
+
+                // 汇总各币种的 pending 金额
+                const summaryParts = [];
+                const cnySum = pendingRequests
+                    .filter(r => r.currency === 'CNY')
+                    .reduce((sum, r) => sum + r.amount, 0);
+                const usdSum = pendingRequests
+                    .filter(r => r.currency === 'USD')
+                    .reduce((sum, r) => sum + r.amount, 0);
+
+                if (cnySum > 0) {
+                    summaryParts.push(`¥${(cnySum / 100).toFixed(2)}`);
+                }
+                if (usdSum > 0) {
+                    summaryParts.push(`$${(usdSum / 100).toFixed(2)}`);
+                }
+
+                const pendingText = summaryParts.join(' / ');
+                const hintTemplate = window.inviteI18n && window.inviteI18n.withdrawal_pending_hint
+                    ? window.inviteI18n.withdrawal_pending_hint
+                    : "您有 {amount} 提现正在等待处理，暂不能提交新的提现申请";
+
+                if (bannerText) {
+                    bannerText.textContent = hintTemplate.replace('{amount}', pendingText);
+                }
+                if (banner) {
+                    banner.style.display = 'flex';
+                }
+                if (btnWithdraw) {
+                    btnWithdraw.disabled = true;
+                    btnWithdraw.style.opacity = '0.6';
+                    btnWithdraw.style.cursor = 'not-allowed';
+                    btnWithdraw.title = window.inviteI18n && window.inviteI18n.withdrawal_pending_limit_error
+                        ? window.inviteI18n.withdrawal_pending_limit_error
+                        : "您已有正在处理中的提现申请";
+                }
+            } else {
+                hasPendingWithdrawal = false;
+                if (banner) banner.style.display = 'none';
+                if (btnWithdraw) {
+                    btnWithdraw.disabled = false;
+                    btnWithdraw.style.opacity = '';
+                    btnWithdraw.style.cursor = '';
+                    btnWithdraw.removeAttribute('title');
+                }
+            }
+        } catch (e) {
+            console.error('[Invite] Error checking pending withdrawals:', e);
         }
     }
 });

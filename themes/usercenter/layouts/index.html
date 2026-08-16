@@ -24,6 +24,25 @@
                         <label>{{ T "user_id" | default "用户 ID" }}</label>
                         <div class="info-value code-font" id="user-id">...</div>
                     </div>
+                    <div class="info-row" id="dashboard-account-plan"
+                        data-locale="{{ .Site.Language.Lang }}"
+                        data-free-plan="{{ T "free_plan" | default "免费版" }}"
+                        data-pro-plan="{{ T "pro_plan" | default "专业版" }}"
+                        data-upgrade="{{ T "upgrade" | default "升级" }}"
+                        data-manage="{{ T "manage_subscription" | default "管理" }}"
+                        data-unavailable="{{ T "subscription_unavailable" | default "加载失败" }}"
+                         data-opening-portal="{{ T "opening_subscription_portal" | default "正在打开订阅管理页面..." }}"
+                         data-portal-error="{{ T "subscription_portal_error" | default "无法打开订阅管理页面，请稍后重试" }}">
+                        <label>{{ T "current_plan" | default "当前计划" }}</label>
+                        <div class="info-value" style="display: flex; align-items: center; gap: 8px;">
+                            <strong id="dashboard-plan-name" style="font-weight: 500;">{{ T "loading" | default "加载中..." }}</strong>
+                            <a class="dashboard-plan-action" id="dashboard-plan-action" hidden></a>
+                        </div>
+                    </div>
+                    <div class="info-row" id="dashboard-plan-expiry-row" hidden>
+                        <label>{{ T "valid_until" | default "有效期" }}</label>
+                        <div class="info-value" id="dashboard-plan-expiry">—</div>
+                    </div>
                 </div>
             </div>
 
@@ -99,7 +118,7 @@
     </div>
 </main>
 
-<script src="{{ absURL "js/common.js"}}"></script>
+<script src="{{ "js/common.js" | relURL }}?v=5"></script>
 <script type="text/javascript">
     window.userI18n = {
         bind: '{{ T "bind" | default "绑定" }}',
@@ -115,7 +134,7 @@
         verification_email_sent: '{{ T "verification_email_sent" | default "验证邮件已发送至新邮箱，请查收确认" }}'
     };
 </script>
-<script src="{{ absURL "js/user.js"}}"></script>
+<script src="{{ "js/user.js" | relURL }}?v=5"></script>
 </body>
 
 </html>
