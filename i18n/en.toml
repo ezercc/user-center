@@ -184,6 +184,9 @@ other = "Log in with Google"
 [github_login_title]
 other = "Log in with GitHub"
 
+[redirecting_to_provider]
+other = "Redirecting to %s for authorization..."
+
 [input_password_label]
 other = "Enter Password"
 

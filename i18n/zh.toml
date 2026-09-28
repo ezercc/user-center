@@ -184,6 +184,9 @@ other = "Google 登录"
 [github_login_title]
 other = "GitHub 登录"
 
+[redirecting_to_provider]
+other = "正在前往 %s 授权..."
+
 [input_password_label]
 other = "输入密码"
 
