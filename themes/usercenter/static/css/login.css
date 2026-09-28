@@ -31,8 +31,8 @@
     padding: 40px 40px 36px;
     border-radius: 28px;
     box-shadow: 0 1px 3px var(--shadow-color), 0 10px 30px var(--shadow-color);
-    backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
     transition: height 0.3s ease;
     overflow: hidden;
     position: relative;

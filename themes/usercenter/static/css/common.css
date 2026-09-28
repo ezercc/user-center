@@ -61,7 +61,7 @@ body {
 .navbar {
     position: fixed; top: 0; left: 0; width: 100%; height: var(--navbar-height);
     background: var(--card-bg);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 24px; z-index: 1000;
     box-shadow: 0 1px 3px var(--shadow-color);
@@ -235,7 +235,7 @@ body {
     right: 0;
     min-width: 120px;
     background-color: var(--card-bg);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: 0 4px 12px var(--shadow-color);
