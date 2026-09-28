@@ -672,4 +672,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             Notifications.show((window.i18n ? window.i18n.password_update_failed : '修改失败: ') + err.message, 'error');
         }
     });
+
+    // 开局静默首轮预热：避开页面初始渲染峰值，延迟 300ms 自动在后台握手获取首个可用 Token
+    setTimeout(() => {
+        if (typeof prewarmCaptcha === 'function') {
+            prewarmCaptcha();
+        }
+    }, 300);
 });

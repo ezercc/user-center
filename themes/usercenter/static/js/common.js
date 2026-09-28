@@ -655,7 +655,12 @@ function runTurnstile(forceModal = true) {
                     'expired-callback': () => {
                         _cachedCaptchaToken = null;
                         cleanupCaptchaState();
-                        reject(new Error('Captcha expired'));
+                        // 滑动保鲜机制：若页面当前仍对用户可见，静默重新触发一轮预热，确保用户点击时总有最新可用 Token
+                        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+                            setTimeout(() => {
+                                prewarmCaptcha();
+                            }, 1000);
+                        }
                     }
                 });
             } catch (e) {
@@ -669,7 +674,7 @@ function runTurnstile(forceModal = true) {
     return _pendingCaptchaPromise;
 }
 
-// 聚焦预热（静默获取，若需交互则暂缓弹窗，等点击提交时再弹）
+// 聚焦/开局预热（静默获取，若需交互则暂缓弹窗，等点击提交时再弹）
 function prewarmCaptcha() {
     if (_cachedCaptchaToken || _pendingCaptchaPromise) return;
     runTurnstile(false)
@@ -680,6 +685,15 @@ function prewarmCaptcha() {
         .catch(() => {
             _cachedCaptchaToken = null;
         });
+}
+
+// 标签页重新切回可见时，若 Token 已空则静默保鲜
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && !_cachedCaptchaToken && !_pendingCaptchaPromise) {
+            prewarmCaptcha();
+        }
+    });
 }
 
 // 消费执行（默认强制允许弹窗）

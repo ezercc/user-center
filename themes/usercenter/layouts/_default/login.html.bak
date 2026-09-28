@@ -252,8 +252,8 @@
             redirecting_to_provider: '{{ T "redirecting_to_provider" }}'
         };
     </script>
-    <script src="{{ "js/common.js" | relURL }}?v=9"></script>
-    <script src="{{ "js/login.js" | relURL }}?v=11"></script>
+    <script src="{{ "js/common.js" | relURL }}?v=8"></script>
+    <script src="{{ "js/login.js" | relURL }}?v=10"></script>
 </body>
 
 </html>
