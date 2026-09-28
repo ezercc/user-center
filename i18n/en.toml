@@ -301,6 +301,14 @@ other = "Failed to load captcha component"
 [captcha_failed]
 other = "Captcha failed"
 
+[captcha_timeout]
+other = "Verification timed out, please try again"
+
+[security_check_title]
+other = "Please complete the security check"
+
+
+
 [verification_success_set_pwd]
 other = "Verification successful, please set a new password"
 

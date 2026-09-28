@@ -173,21 +173,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-.auth-card .btn-primary:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-    box-shadow: none;
-    pointer-events: none;
-}
-
-.auth-card .social-btn:disabled,
-.auth-card .social-btn[aria-disabled="true"] {
-    opacity: 0.65;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-
 .btn-text {
     background: transparent;
     color: var(--primary-color);

@@ -301,6 +301,14 @@ other = "验证组件加载失败"
 [captcha_failed]
 other = "验证失败"
 
+[captcha_timeout]
+other = "验证超时，请重试"
+
+[security_check_title]
+other = "请完成安全验证"
+
+
+
 [verification_success_set_pwd]
 other = "验证成功，请设置新密码"
 
