@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    if (typeof client === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const isMock = urlParams.get('mock') === '1' || urlParams.get('mock') === 'true';
+
+    if ((typeof client === 'undefined' || !client) && !isMock) return;
 
     // 拦截 Recovery 状态
     const hash = window.location.hash;
     const isRecoveryFlow = hash && hash.includes('type=recovery');
 
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalhost && !isRecoveryFlow) {
+    if (isLocalhost && !isRecoveryFlow && !isMock) {
         console.log('[Login] Dev mode: Bypassing login on localhost');
         const params = new URLSearchParams(window.location.search);
         let redirect = params.get('redirect') || '/';
@@ -61,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // 解析 URL 中的邀请码 (aff)
-    const urlParams = new URLSearchParams(window.location.search);
     const affCode = urlParams.get('aff');
     if (affCode && elements.regInviteCode) {
         elements.regInviteCode.value = affCode.trim();
@@ -132,38 +134,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================================
     // 监听 Auth 状态
     // ============================================================
-    client.auth.onAuthStateChange(async (event, session) => {
-        // 调试日志
-        console.log("Auth Event:", event);
+    if (client && client.auth) {
+        client.auth.onAuthStateChange(async (event, session) => {
+            // 调试日志
+            console.log("Auth Event:", event);
 
-        // 情况 1: 明确捕获到 RECOVERY 事件 (最理想情况)
-        if (event === 'PASSWORD_RECOVERY') {
-            switchStep('update');
-            Notifications.show(window.i18n ? window.i18n.verification_success_set_pwd : '验证成功，请设置新密码', 'success');
-            return;
-        }
-
-        // 情况 2: 捕获到 SIGNED_IN 事件 (Supabase 恢复链接本质上也是一次登录)
-        if (event === 'SIGNED_IN') {
-            // >>> 关键修改：检查我们在页面加载初期捕获的变量 <<<
-            if (isRecoveryFlow) {
-                console.log(window.i18n ? window.i18n.intercept_redirect_log : "拦截自动跳转，进入重置密码界面");
+            // 情况 1: 明确捕获到 RECOVERY 事件 (最理想情况)
+            if (event === 'PASSWORD_RECOVERY') {
                 switchStep('update');
-
-                // 只有当 session 存在时才显示提示，避免误报
-                if (session) {
-                    Notifications.show(window.i18n ? window.i18n.recovery_interception_msg : '请设置您的新密码', 'info');
-                }
-            } else {
-                // 只有在【非】重置模式下，才执行自动跳转
-                setTimeout(() => {
-                    // 双重保险：再次检查 URL (虽然 hash 可能已经被清除了)
-                    // 但主要依赖上面的 isRecoveryFlow 变量
-                    window.location.href = getRedirectUrl();
-                }, 500);
+                Notifications.show(window.i18n ? window.i18n.verification_success_set_pwd : '验证成功，请设置新密码', 'success');
+                return;
             }
-        }
-    });
+
+            // 情况 2: 捕获到 SIGNED_IN 事件 (Supabase 恢复链接本质上也是一次登录)
+            if (event === 'SIGNED_IN') {
+                // >>> 关键修改：检查我们在页面加载初期捕获的变量 <<<
+                if (isRecoveryFlow) {
+                    console.log(window.i18n ? window.i18n.intercept_redirect_log : "拦截自动跳转，进入重置密码界面");
+                    switchStep('update');
+
+                    // 只有当 session 存在时才显示提示，避免误报
+                    if (session) {
+                        Notifications.show(window.i18n ? window.i18n.recovery_interception_msg : '请设置您的新密码', 'info');
+                    }
+                } else {
+                    // 只有在【非】重置模式下，才执行自动跳转
+                    setTimeout(() => {
+                        // 双重保险：再次检查 URL (虽然 hash 可能已经被清除了)
+                        // 但主要依赖上面的 isRecoveryFlow 变量
+                        window.location.href = getRedirectUrl();
+                    }, 500);
+                }
+            }
+        });
+    }
 
     // ============================================================
     // 常规登录/注册逻辑
@@ -176,7 +180,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!/^\S+@\S+\.\S+$/.test(email)) return Notifications.show(window.i18n ? window.i18n.invalid_email_format : '邮箱格式不正确', 'warning');
         currentEmail = email;
         switchStep('password');
+        if (typeof prewarmCaptcha === 'function') prewarmCaptcha();
     });
+
+    // 聚焦最后一个输入框时静默预热人机验证
+    const pwdInput = document.getElementById('input-password');
+    if (pwdInput) {
+        pwdInput.addEventListener('focus', () => {
+            if (typeof prewarmCaptcha === 'function') prewarmCaptcha();
+        });
+    }
+
+    const regPwdRepeat = document.getElementById('reg-password-repeat');
+    if (regPwdRepeat) {
+        regPwdRepeat.addEventListener('focus', () => {
+            if (typeof prewarmCaptcha === 'function') prewarmCaptcha();
+        });
+    }
+
+    if (elements.forgotEmail) {
+        elements.forgotEmail.addEventListener('focus', () => {
+            if (typeof prewarmCaptcha === 'function') prewarmCaptcha();
+        });
+    }
+
 
     // 2. 去注册
     document.getElementById('btn-to-register').addEventListener('click', () => {
@@ -203,9 +230,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 5. 登录
-    document.getElementById('btn-login').addEventListener('click', async () => {
+    document.getElementById('btn-login').addEventListener('click', async (e) => {
         const password = document.getElementById('input-password').value;
         if (!password) return Notifications.show(window.i18n ? window.i18n.please_enter_password : '请输入密码', 'warning');
+
+        const btn = e.currentTarget;
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.classList.add('btn-loading');
+
+        if (isMock) {
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('btn-loading');
+                Notifications.show(window.i18n ? window.i18n.login_success : '登录成功', 'success');
+            }, 2000);
+            return;
+        }
 
         try {
             const token = await executeCaptcha();
@@ -217,7 +258,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) throw error;
             Notifications.show(window.i18n ? window.i18n.login_success : '登录成功', 'success');
         } catch (err) {
-            if (err !== 'Captcha closed') Notifications.show(err.message || (window.i18n ? window.i18n.login_failed : '登录失败'), 'error');
+            if (err?.message !== 'Captcha closed') Notifications.show(err.message || (window.i18n ? window.i18n.login_failed : '登录失败'), 'error');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('btn-loading');
         }
     });
 
@@ -245,12 +289,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 1000);
     }
 
-    async function sendOtpCode() {
+    async function sendOtpCode(e) {
+        const triggerBtn = (e && e.currentTarget) ? e.currentTarget : document.getElementById('btn-otp-login');
+        if (triggerBtn && triggerBtn.disabled) return;
+        if (triggerBtn) triggerBtn.disabled = true;
+
         if (isLocalhost) {
             console.log("[Localhost mock mode] Sending simulated OTP, switching to step-otp.");
             Notifications.show(window.i18n ? window.i18n.local_mock_otp_sent : '[本地模拟] 验证码已发送至您的邮箱 (已自动模拟为 123456)', 'info');
             switchStep('otp');
             startResendCountdown();
+            if (triggerBtn && triggerBtn.id !== 'btn-otp-resend') triggerBtn.disabled = false;
             return;
         }
 
@@ -267,7 +316,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             switchStep('otp');
             startResendCountdown();
         } catch (err) {
-            if (err !== 'Captcha closed') Notifications.show(err.message || '发送验证码失败', 'error');
+            if (err?.message !== 'Captcha closed') Notifications.show(err.message || '发送验证码失败', 'error');
+        } finally {
+            if (triggerBtn && triggerBtn.id !== 'btn-otp-resend') triggerBtn.disabled = false;
         }
     }
 
@@ -426,32 +477,72 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 7. 第三方登录
     document.querySelectorAll('.social-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const provider = e.currentTarget.getAttribute('data-provider');
-            try {
-                const token = await executeCaptcha();
-                const oauthOptions = {
-                    captchaToken: token,
-                    redirectTo: getRedirectUrl()
-                };
+        // 鼠标悬浮/聚焦时静默预热人机验证（利用悬浮到点击的延迟提前就绪 Token）
+        const triggerPrewarm = () => {
+            if (typeof prewarmCaptcha === 'function') prewarmCaptcha();
+        };
+        btn.addEventListener('mouseenter', triggerPrewarm);
+        btn.addEventListener('focus', triggerPrewarm);
+        btn.addEventListener('touchstart', triggerPrewarm, { passive: true });
 
-                // 如果 URL 中带有邀请码，封装到 options.data 中传递给第三方登录，绑定为新用户的推荐人
-                if (affCode) {
-                    oauthOptions.data = {
-                        referred_by: affCode.trim()
+        btn.addEventListener('click', (e) => {
+            const targetBtn = e.currentTarget;
+            if (targetBtn.getAttribute('aria-disabled') === 'true' || targetBtn.disabled) return;
+            targetBtn.setAttribute('aria-disabled', 'true');
+            targetBtn.disabled = true;
+
+            const provider = targetBtn.getAttribute('data-provider');
+            const providerNames = {
+                google: 'Google',
+                github: 'GitHub',
+                azure: 'Microsoft'
+            };
+            const pName = providerNames[provider] || (provider ? provider.charAt(0).toUpperCase() + provider.slice(1) : '');
+            const template = (window.i18n && window.i18n.redirecting_to_provider) || '正在前往 %s 授权...';
+
+            // 点击瞬间立即同步弹出提示，绝不等待后续 Captcha 验证
+            Notifications.show(template.replace('%s', pName), 'info');
+
+            if (isMock) {
+                setTimeout(() => {
+                    targetBtn.removeAttribute('aria-disabled');
+                    targetBtn.disabled = false;
+                }, 1500);
+                return;
+            }
+
+            // 异步执行后续人机验证与跳转流程
+            (async () => {
+                try {
+                    const token = await executeCaptcha();
+                    const oauthOptions = {
+                        captchaToken: token,
+                        redirectTo: getRedirectUrl()
                     };
-                }
 
-                await client.auth.signInWithOAuth({
-                    provider: provider,
-                    options: oauthOptions
-                });
-            } catch (err) { if (err !== 'Captcha closed') Notifications.show(err.message, 'error'); }
+                    // 如果 URL 中带有邀请码，封装到 options.data 中传递给第三方登录，绑定为新用户的推荐人
+                    if (affCode) {
+                        oauthOptions.data = {
+                            referred_by: affCode.trim()
+                        };
+                    }
+
+                    await client.auth.signInWithOAuth({
+                        provider: provider,
+                        options: oauthOptions
+                    });
+                } catch (err) {
+                    if (err?.message !== 'Captcha closed') Notifications.show(err.message, 'error');
+                } finally {
+                    targetBtn.removeAttribute('aria-disabled');
+                    targetBtn.disabled = false;
+                }
+            })();
         });
     });
 
     // 8. 注册
-    document.getElementById('btn-register').addEventListener('click', async () => {
+    document.getElementById('btn-register').addEventListener('click', async (e) => {
         const email = elements.regEmail.value.trim();
         const pwd = document.getElementById('reg-password').value;
         const pwdR = document.getElementById('reg-password-repeat').value;
@@ -461,6 +552,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!/^\S+@\S+\.\S+$/.test(email)) return Notifications.show(window.i18n ? window.i18n.invalid_email_format : '邮箱格式不正确', 'warning');
         if (pwd.length < 8) return Notifications.show(window.i18n ? window.i18n.password_too_short : '密码长度需大于8位', 'warning');
         if (pwd !== pwdR) return Notifications.show(window.i18n ? window.i18n.password_mismatch : '两次密码输入不一致', 'warning');
+
+        const btn = e.currentTarget;
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.classList.add('btn-loading');
+
+        if (isMock) {
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('btn-loading');
+                Notifications.show('注册成功，请查收验证邮件', 'success');
+            }, 2000);
+            return;
+        }
 
         try {
             const token = await executeCaptcha();
@@ -484,7 +589,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (successEmailEl) successEmailEl.textContent = email;
             switchStep('registerSuccess');
         } catch (err) {
-            if (err !== 'Captcha closed') Notifications.show(err.message, 'error');
+            if (err?.message !== 'Captcha closed') Notifications.show(err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('btn-loading');
         }
     });
 
@@ -515,9 +623,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-cancel-forgot').addEventListener('click', () => switchStep('email'));
 
     // C. 发送重置邮件
-    document.getElementById('btn-send-reset-link').addEventListener('click', async () => {
+    document.getElementById('btn-send-reset-link').addEventListener('click', async (e) => {
         const email = elements.forgotEmail.value.trim();
         if (!email) return Notifications.show(window.i18n ? window.i18n.please_enter_email : '请输入注册邮箱', 'warning');
+
+        const btn = e.currentTarget;
+        if (btn.disabled) return;
+        btn.disabled = true;
 
         try {
             const token = await executeCaptcha();
@@ -530,7 +642,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 可以选择跳回登录页，或者停留在当前页提示
             setTimeout(() => switchStep('email'), 2000);
         } catch (err) {
-            if (err !== 'Captcha closed') Notifications.show(err.message, 'error');
+            if (err?.message !== 'Captcha closed') Notifications.show(err.message, 'error');
+        } finally {
+            btn.disabled = false;
         }
     });
 
@@ -558,4 +672,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             Notifications.show((window.i18n ? window.i18n.password_update_failed : '修改失败: ') + err.message, 'error');
         }
     });
+
+    // 开局静默首轮预热：避开页面初始渲染峰值，延迟 300ms 自动在后台握手获取首个可用 Token
+    setTimeout(() => {
+        if (typeof prewarmCaptcha === 'function') {
+            prewarmCaptcha();
+        }
+    }, 300);
 });

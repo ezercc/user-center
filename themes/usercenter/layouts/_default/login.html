@@ -230,6 +230,10 @@
             password_update_failed: '{{ T "password_update_failed" }}',
             captcha_load_failed: '{{ T "captcha_load_failed" }}',
             captcha_failed: '{{ T "captcha_failed" }}',
+            captcha_timeout: '{{ T "captcha_timeout" }}',
+            security_check_title: '{{ T "security_check_title" }}',
+
+
             verification_success_set_pwd: '{{ T "verification_success_set_pwd" }}',
             recovery_interception_msg: '{{ T "recovery_interception_msg" }}',
             password_complexity_error: '{{ T "password_complexity_error" }}',
@@ -244,11 +248,12 @@
             otp_invalid_or_expired: '{{ T "otp_invalid_or_expired" }}',
             local_mock_otp_sent: '{{ T "local_mock_otp_sent" }}',
             local_mock_login_success: '{{ T "local_mock_login_success" }}',
-            local_mock_otp_error: '{{ T "local_mock_otp_error" }}'
+            local_mock_otp_error: '{{ T "local_mock_otp_error" }}',
+            redirecting_to_provider: '{{ T "redirecting_to_provider" }}'
         };
     </script>
-    <script src="{{ "js/common.js" | relURL }}?v=5"></script>
-    <script src="{{ "js/login.js" | relURL }}?v=5"></script>
+    <script src="{{ "js/common.js" | relURL }}?v=9"></script>
+    <script src="{{ "js/login.js" | relURL }}?v=11"></script>
 </body>
 
 </html>

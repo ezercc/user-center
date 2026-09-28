@@ -173,6 +173,55 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+.auth-card .btn-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+/* 按钮加载中转圈状态 */
+.auth-card .btn-primary.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.auth-card .btn-primary.btn-loading:disabled {
+    opacity: 0.85;
+    cursor: wait;
+}
+
+.auth-card .btn-primary.btn-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    margin-left: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: btn-spin 0.75s linear infinite;
+    box-sizing: border-box;
+}
+
+@keyframes btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.auth-card .social-btn:disabled,
+.auth-card .social-btn[aria-disabled="true"] {
+    opacity: 0.65;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
 .btn-text {
     background: transparent;
     color: var(--primary-color);
