@@ -489,7 +489,7 @@ function getCaptchaOverlay() {
         overlay.className = 'captcha-overlay';
         overlay.innerHTML = `
             <div class="captcha-box" style="position:relative; min-width:320px; display:flex; flex-direction:column; align-items:center; gap:16px;">
-                <div style="font-size:14px; font-weight:500; color:var(--text-primary); text-align:center;">
+                <div style="font-size:14px; font-weight:500; color:var(--text-color); text-align:center;">
                     ${(window.i18n && window.i18n.security_check_title) || (window.userI18n && window.userI18n.security_check_title) || '请完成安全验证'}
                 </div>
                 <div id="cf-turnstile-slot" style="min-height:65px; display:flex; align-items:center; justify-content:center;"></div>
@@ -548,7 +548,9 @@ function runTurnstile(forceModal = true) {
             // 若预热期间已触发了交互质询，现在用户提交了，立刻唤起弹窗并重设为长交互超时
             if (_needsInteraction) {
                 showCaptchaOverlay();
-                resetInteractiveTimeout();
+                if (typeof window.resetInteractiveTimeout === 'function') {
+                    window.resetInteractiveTimeout();
+                }
             }
         }
         return _pendingCaptchaPromise;
