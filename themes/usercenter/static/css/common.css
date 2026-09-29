@@ -214,9 +214,29 @@ body {
     opacity: 0; visibility: hidden; transition: opacity 0.3s;
 }
 .captcha-overlay.active { opacity: 1; visibility: visible; }
-.captcha-box {
-    background: var(--bg-color); padding: 20px; border-radius: 12px;
+.captcha-overlay .captcha-box {
+    position: relative;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-color);
+    padding: 24px 20px;
+    border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.captcha-overlay .captcha-box-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    text-align: center;
+}
+.captcha-overlay .captcha-slot {
+    min-height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Language Dropdown */

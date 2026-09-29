@@ -488,11 +488,11 @@ function getCaptchaOverlay() {
         overlay.id = 'cf-interactive-overlay';
         overlay.className = 'captcha-overlay';
         overlay.innerHTML = `
-            <div class="captcha-box" style="position:relative; min-width:320px; display:flex; flex-direction:column; align-items:center; gap:16px;">
-                <div style="font-size:14px; font-weight:500; color:var(--text-color); text-align:center;">
+            <div class="captcha-box">
+                <div class="captcha-box-title">
                     ${(window.i18n && window.i18n.security_check_title) || (window.userI18n && window.userI18n.security_check_title) || '请完成安全验证'}
                 </div>
-                <div id="cf-turnstile-slot" style="min-height:65px; display:flex; align-items:center; justify-content:center;"></div>
+                <div id="cf-turnstile-slot" class="captcha-slot"></div>
             </div>
         `;
         document.body.appendChild(overlay);

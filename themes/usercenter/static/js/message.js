@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. 加载联系人列表 (修复红点显示)
     // ============================================================
     async function loadContacts() {
-        contactListEl.innerHTML = '<div class="loading-spinner" style="margin:20px auto"></div>';
+        contactListEl.innerHTML = '<div class="chat-spinner"></div>';
 
         try {
             // A. 获取系统通知 (预览 + 未读数)
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (err) {
             console.error(err);
-            contactListEl.innerHTML = '<p style="color:red;text-align:center">加载失败: ' + err.message + '</p>';
+            contactListEl.innerHTML = '<p class="chat-status-msg error">加载失败: ' + escapeHtml(err.message) + '</p>';
         }
     }
 
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const displayName = user.isSystem ? rawName : rawName.split('@')[0];
 
         const initial = user.isSystem ?
-            '<span class="material-icons-round" style="font-size:20px">campaign</span>' :
+            '<span class="material-icons-round">campaign</span>' :
             (rawName[0].toUpperCase());
 
         // >>> 修复：获取未读数并生成 HTML <<<
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rawName = userProfile.email || 'Unknown';
         document.getElementById('current-chat-name').textContent = userProfile.isSystem ? rawName : rawName.split('@')[0];
 
-        messagesArea.innerHTML = '<div class="loading-spinner" style="margin:20px auto"></div>';
+        messagesArea.innerHTML = '<div class="chat-spinner"></div>';
 
         // ----------------------------------------------------
         // 分支 A: 系统通知
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             } catch (err) {
                 console.error(err);
-                messagesArea.innerHTML = `<p style="text-align:center">${window.messageI18n ? window.messageI18n.load_notifications_failed : '加载通知失败'}</p>`;
+                messagesArea.innerHTML = `<p class="chat-status-msg error">${window.messageI18n ? window.messageI18n.load_notifications_failed : '加载通知失败'}</p>`;
             }
         }
         // ----------------------------------------------------
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             } catch (err) {
                 console.error(err);
-                messagesArea.innerHTML = `<p style="text-align:center">${window.messageI18n ? window.messageI18n.load_messages_failed : '消息加载失败'}</p>`;
+                messagesArea.innerHTML = `<p class="chat-status-msg error">${window.messageI18n ? window.messageI18n.load_messages_failed : '消息加载失败'}</p>`;
             }
         }
     }
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderSystemMessages(notifications) {
         messagesArea.innerHTML = '';
         if (!notifications || notifications.length === 0) {
-            messagesArea.innerHTML = `<p style="text-align:center;color:#ccc;margin-top:20px">${window.messageI18n ? window.messageI18n.no_system_messages : '暂无系统通知'}</p>`;
+            messagesArea.innerHTML = `<p class="chat-status-msg">${window.messageI18n ? window.messageI18n.no_system_messages : '暂无系统通知'}</p>`;
             return;
         }
 
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderPrivateMessages(messages) {
         messagesArea.innerHTML = '';
         if (!messages || messages.length === 0) {
-            messagesArea.innerHTML = `<p style="text-align:center;color:#ccc;margin-top:20px">${window.messageI18n ? window.messageI18n.no_messages_yet : '暂无消息，打个招呼吧！'}</p>`;
+            messagesArea.innerHTML = `<p class="chat-status-msg">${window.messageI18n ? window.messageI18n.no_messages_yet : '暂无消息，打个招呼吧！'}</p>`;
             return;
         }
         messages.forEach(msg => appendMessageUI(msg));

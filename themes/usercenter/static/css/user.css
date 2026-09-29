@@ -664,6 +664,30 @@ body {
     font-size: 15px;
 }
 
+/* 聊天面板状态提示与加载动画样式 */
+.chat-container .chat-status-msg {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-top: 20px;
+    font-size: 14px;
+}
+.chat-container .chat-status-msg.error {
+    color: #ff4d4f;
+}
+.chat-container .chat-spinner,
+.chat-container .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+    margin: 20px auto;
+}
+.contact-item.system-item .avatar-placeholder .material-icons-round {
+    font-size: 20px;
+}
+
 /* =========================================
    红点通知 (Badges)
    ========================================= */

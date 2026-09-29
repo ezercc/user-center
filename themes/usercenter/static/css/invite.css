@@ -1,0 +1,738 @@
+    /* 邀请码与额度统计专属高级布局 */
+    .invite-left-col, .invite-right-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .invite-code-card {
+        min-height: 220px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        container-type: inline-size;
+    }
+
+    .quota-stats-card {
+        min-height: 220px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .referred-list-card {
+        min-height: 460px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .referred-list-card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .invite-code-card .card-body, .quota-stats-card .card-body {
+        padding: 16px 24px;
+    }
+    
+    .code-box-wrapper-compact {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 16px;
+        background: rgba(26, 115, 232, 0.04);
+        border-radius: 8px;
+        border: 1px dashed rgba(26, 115, 232, 0.3);
+        margin-bottom: 8px;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .code-box-wrapper-compact {
+        background: rgba(26, 115, 232, 0.08);
+        border-color: rgba(26, 115, 232, 0.5);
+    }
+
+    .invite-code-display {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: var(--primary-color);
+        font-family: 'Outfit', 'Inter', monospace;
+        z-index: 2;
+        text-shadow: 0 0 12px rgba(26, 115, 232, 0.25);
+    }
+
+    .pulse-ring {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border: 2px solid var(--primary-color);
+        border-radius: 50%;
+        opacity: 0;
+        animation: pulse-ring-animation 3s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+        pointer-events: none;
+    }
+
+    @keyframes pulse-ring-animation {
+        0% { transform: scale(0.3); opacity: 0; }
+        50% { opacity: 0.15; }
+        100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .hint-text {
+        text-align: center;
+        margin-bottom: 12px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    /* 邀请规则样式 */
+    .invite-rules-box {
+        margin-top: 4px;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .rules-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .rules-title-icon {
+        font-size: 16px;
+        color: var(--primary-color);
+    }
+
+    .rules-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .rules-list li {
+        margin-bottom: 6px;
+    }
+    
+    .rules-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    /* 链接与复制栏设计 */
+    .link-copy-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    #invite-link-input {
+        flex: 1;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--input-bg);
+        color: var(--text-secondary);
+        font-size: 12px;
+        outline: none;
+        text-align: left;
+        transition: border-color 0.2s;
+    }
+
+    #invite-link-input:focus {
+        border-color: var(--primary-color);
+    }
+
+    #btn-copy-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 16px;
+        height: 38px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 13px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        box-shadow: 0 4px 10px rgba(26, 115, 232, 0.15);
+        transition: all 0.2s ease;
+    }
+
+    #btn-copy-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(26, 115, 232, 0.25);
+    }
+
+    .btn-text-full {
+        display: inline;
+    }
+
+    .btn-text-short {
+        display: none;
+    }
+
+    /* 容器查询自适应复制按钮 */
+    @container (max-width: 380px) {
+        .btn-text-full {
+            display: none;
+        }
+        .btn-text-short {
+            display: inline;
+        }
+    }
+
+    @container (max-width: 290px) {
+        .btn-text-full, .btn-text-short {
+            display: none;
+        }
+        #btn-copy-link {
+            padding: 0;
+            width: 38px;
+            min-width: 38px;
+            justify-content: center;
+        }
+    }
+
+    /* 额度统计专属高级设计 */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .stat-box {
+        background: rgba(0, 0, 0, 0.015);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] .stat-box {
+        background: rgba(255, 255, 255, 0.025);
+    }
+
+    .stat-box:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.08);
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--primary-color);
+        font-family: 'Outfit', 'Inter', sans-serif;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+    }
+
+    .expiration-banner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 152, 0, 0.06);
+        border: 1px solid rgba(255, 152, 0, 0.15);
+        border-radius: 8px;
+        padding: 6px 12px;
+        color: #d84315;
+        font-size: 12px;
+        transition: all 0.2s ease;
+    }
+
+    [data-theme="dark"] .expiration-banner {
+        background: rgba(255, 152, 0, 0.1);
+        border-color: rgba(255, 152, 0, 0.25);
+        color: #ffb74d;
+    }
+
+    .expiration-banner .info-icon {
+        font-size: 16px;
+    }
+
+    /* 表格与列表高级样式 */
+    .table-responsive {
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    /* 极细高级定制滚动条 */
+    .table-responsive::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+    }
+
+    .invite-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .invite-table th {
+        padding: 14px 20px;
+        font-weight: 500;
+        font-size: 13px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(0, 0, 0, 0.02);
+    }
+
+    [data-theme="dark"] .invite-table th {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .invite-table td {
+        padding: 14px 20px;
+        font-size: 14px;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .invite-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .invite-table tbody tr:hover {
+        background-color: rgba(26, 115, 232, 0.03);
+    }
+
+    .invite-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .empty-state {
+        padding: 48px 24px;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .empty-state span {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.3;
+    }
+
+    .btn-icon {
+        font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* 推广收益钱包专属样式 */
+    .rebate-stats-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .rebate-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .rebate-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    .rebate-item-box {
+        padding: 0;
+        background: transparent;
+        border: none;
+    }
+    .rebate-currency-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+    }
+    .rebate-stats-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .rebate-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+    .val-wrapper {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+    }
+    .currency-symbol {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+    .rebate-stat .val {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-color);
+        font-family: 'Outfit', 'Inter', sans-serif;
+    }
+    .rebate-stat .lbl {
+        font-size: 11px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+    .withdrawal-action-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+    #btn-request-withdrawal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: auto;
+        min-width: 140px;
+        height: 38px;
+        padding: 0 16px;
+        font-size: 13px;
+        text-decoration: none;
+        border-radius: 8px;
+        background: var(--primary-color);
+        color: white;
+        font-weight: 500;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        cursor: pointer;
+    }
+    #btn-request-withdrawal:hover {
+        background: var(--primary-hover, #1557b0);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+    }
+
+    /* 提现模态框专属样式 */
+    #withdrawal-modal.modal-overlay {
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.5) !important;
+    }
+    @media (max-height: 700px) {
+        #withdrawal-modal.modal-overlay {
+            align-items: flex-start;
+            overflow-y: auto;
+        }
+    }
+    .withdrawal-modal-card {
+        max-width: 500px !important;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 24px 32px;
+        text-align: left;
+        position: relative;
+    }
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: color 0.2s;
+    }
+    .modal-close:hover {
+        color: var(--text-color);
+    }
+    .modal-header-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .modal-header-icon {
+        font-size: 32px;
+        color: var(--primary-color);
+    }
+    .modal-header-section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-color);
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="number"] {
+        width: 100%;
+        height: 42px;
+        padding: 0 16px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg, transparent);
+        color: var(--text-color);
+        outline: none;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+    .form-group input[type="text"]:focus,
+    .form-group input[type="number"]:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+    .amount-input-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--input-bg, transparent);
+        height: 42px;
+        box-sizing: border-box;
+        overflow: hidden;
+        transition: all 0.2s;
+        position: relative;
+    }
+    .amount-input-wrapper:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+    .currency-select-inline {
+        background: transparent !important;
+        border: none !important;
+        border-right: 1px solid var(--border-color) !important;
+        border-radius: 8px 0 0 8px !important;
+        height: 100% !important;
+        width: 80px !important;
+        padding: 0 24px 0 12px !important;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-color);
+        outline: none;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: none !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 8px center !important;
+        background-size: 14px !important;
+        color-scheme: light dark;
+    }
+    .currency-select-inline option {
+        background: var(--card-bg, #202124);
+        color: var(--text-color, #fff);
+    }
+    .amount-input-wrapper input {
+        border: none !important;
+        height: 100% !important;
+        flex: 1;
+        padding-left: 12px !important;
+        padding-right: 64px !important;
+        box-shadow: none !important;
+    }
+    .form-group select:not(.currency-select-inline) {
+        width: 100%;
+        height: 42px;
+        padding: 0 36px 0 16px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg, transparent);
+        color: var(--text-color);
+        outline: none;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        font-family: inherit;
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 14px;
+        color-scheme: light dark;
+    }
+    .form-group select:not(.currency-select-inline) option {
+        background: var(--card-bg, #202124);
+        color: var(--text-color, #fff);
+    }
+    .form-group select:not(.currency-select-inline):focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+    .btn-text-only {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 8px;
+    }
+    .btn-text-only:hover {
+        opacity: 0.8;
+    }
+    .amount-hint {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 6px;
+    }
+    .info-alert {
+        display: flex;
+        gap: 10px;
+        background: var(--alert-bg, rgba(26, 115, 232, 0.08));
+        border: 1px dashed var(--primary-color);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+    .info-alert-icon {
+        color: var(--primary-color);
+        font-size: 20px;
+    }
+    .info-alert-text {
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-color);
+    }
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 28px;
+    }
+    .btn-secondary {
+        height: 38px;
+        padding: 0 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+        background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+    }
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .pending-withdrawal-banner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 152, 0, 0.06);
+        border: 1px solid rgba(255, 152, 0, 0.15);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #d84315;
+        font-size: 13px;
+        margin-bottom: 12px;
+        margin-top: 12px;
+    }
+    [data-theme="dark"] .pending-withdrawal-banner {
+        background: rgba(255, 152, 0, 0.1);
+        border-color: rgba(255, 152, 0, 0.25);
+        color: #ffb74d;
+    }
+    .pending-withdrawal-banner .info-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+/* =========================================
+   邀请页面交互状态扩展（用于解耦 JS 内联样式）
+   ========================================= */
+.btn-copy.copied {
+    background: #4caf50 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
+}
+
+.invite-state-error {
+    padding: 30px;
+    text-align: center;
+    color: #ff4d4f;
+    font-size: 14px;
+}
+
+.withdrawal-modal-card .form-actions .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pending-withdrawal-banner.hidden,
+.expiration-banner.hidden,
+#bank-fields-container.hidden,
+#bank-region-group.hidden,
+#bank-mainland-fields.hidden,
+#bank-non-mainland-fields.hidden {
+    display: none !important;
+}
+
+#btn-request-withdrawal:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+select:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

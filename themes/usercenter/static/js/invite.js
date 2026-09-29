@@ -183,8 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         origTextFull.textContent = copiedText;
         origTextShort.textContent = copiedText;
         origIcon.textContent = 'check';
-        btn.style.background = '#4caf50';
-        btn.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.3)';
+        btn.classList.add('copied');
 
         Notifications.show(window.inviteI18n ? window.inviteI18n.invite_link_copied : '邀请链接已复制到剪贴板！', 'success');
 
@@ -192,8 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             origTextFull.textContent = prevTextFull;
             origTextShort.textContent = prevTextShort;
             origIcon.textContent = prevIconText;
-            btn.style.background = '';
-            btn.style.boxShadow = '';
+            btn.classList.remove('copied');
         }, 2000);
     }
 
@@ -215,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error) {
             console.error('[Invite] Query referred users failed:', error);
             const failText = window.inviteI18n && window.inviteI18n.load_referred_users_failed ? window.inviteI18n.load_referred_users_failed : '加载受邀人数据失败';
-            container.innerHTML = `<div style="padding: 30px; text-align: center; color: #ff4d4f;">${failText}: ${error.message || JSON.stringify(error)}</div>`;
+            container.innerHTML = `<div class="invite-state-error">${failText}: ${escapeHtml(error.message || JSON.stringify(error))}</div>`;
             return;
         }
 
@@ -405,10 +403,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 if (expireEl) expireEl.textContent = expireMsg;
-                if (expireBanner) expireBanner.style.display = 'flex';
+                if (expireBanner) expireBanner.classList.remove('hidden');
             } else {
                 if (expireEl) expireEl.textContent = window.inviteI18n ? window.inviteI18n.no_expiring_quota : '暂无即将过期的额度';
-                if (expireBanner) expireBanner.style.display = 'none';
+                if (expireBanner) expireBanner.classList.add('hidden');
             }
 
             // 渲染推广收益钱包
@@ -418,7 +416,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (remainingEl) remainingEl.textContent = '-';
             if (accumulatedEl) accumulatedEl.textContent = '-';
             if (expireEl) expireEl.textContent = '加载出错';
-            if (expireBanner) expireBanner.style.display = 'none';
+            if (expireBanner) expireBanner.classList.add('hidden');
             renderRebateWallet(null);
         }
     }
@@ -501,12 +499,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const i18n = window.inviteI18n || {};
 
             if (selectedMethod === 'bank') {
-                bankFields.style.display = 'block';
-                bankRegionGroup.style.display = 'block';
+                bankFields.classList.remove('hidden');
+                bankRegionGroup.classList.remove('hidden');
 
                 if (selectedRegion === 'mainland') {
-                    bankMainlandFields.style.display = 'block';
-                    bankNonMainlandFields.style.display = 'none';
+                    bankMainlandFields.classList.remove('hidden');
+                    bankNonMainlandFields.classList.add('hidden');
 
                     inputBankName.setAttribute('required', 'required');
                     inputBankNameEn.removeAttribute('required');
@@ -518,8 +516,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     inputCardNum.setAttribute('placeholder', i18n.card_number_placeholder || '请输入银行卡号');
                     inputCardNumConfirm.setAttribute('placeholder', i18n.confirm_card_number_placeholder || '请再次输入银行卡号以核对');
                 } else {
-                    bankMainlandFields.style.display = 'none';
-                    bankNonMainlandFields.style.display = 'block';
+                    bankMainlandFields.classList.add('hidden');
+                    bankNonMainlandFields.classList.remove('hidden');
 
                     inputBankName.removeAttribute('required');
                     inputBankNameEn.setAttribute('required', 'required');
@@ -532,8 +530,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     inputCardNumConfirm.setAttribute('placeholder', i18n.confirm_card_number_non_mainland_placeholder || '请再次输入银行账号或IBAN以核对');
                 }
             } else {
-                bankFields.style.display = 'none';
-                bankRegionGroup.style.display = 'none';
+                bankFields.classList.add('hidden');
+                bankRegionGroup.classList.add('hidden');
 
                 inputBankName.removeAttribute('required');
                 inputBankNameEn.removeAttribute('required');
@@ -802,23 +800,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     bannerText.textContent = hintTemplate.replace('{amount}', pendingText);
                 }
                 if (banner) {
-                    banner.style.display = 'flex';
+                    banner.classList.remove('hidden');
                 }
                 if (btnWithdraw) {
                     btnWithdraw.disabled = true;
-                    btnWithdraw.style.opacity = '0.6';
-                    btnWithdraw.style.cursor = 'not-allowed';
                     btnWithdraw.title = window.inviteI18n && window.inviteI18n.withdrawal_pending_limit_error
                         ? window.inviteI18n.withdrawal_pending_limit_error
                         : "您已有正在处理中的提现申请";
                 }
             } else {
                 hasPendingWithdrawal = false;
-                if (banner) banner.style.display = 'none';
+                if (banner) banner.classList.add('hidden');
                 if (btnWithdraw) {
                     btnWithdraw.disabled = false;
-                    btnWithdraw.style.opacity = '';
-                    btnWithdraw.style.cursor = '';
                     btnWithdraw.removeAttribute('title');
                 }
             }
